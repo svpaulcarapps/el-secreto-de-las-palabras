@@ -60,7 +60,11 @@ footer a{display:inline-flex;align-items:center;gap:.45rem;color:#224d7c;font-we
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
 <span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
-<dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content"></p><form method="dialog"><button>Cerrar</button></form></dialog>
+<dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p><form id="account-form" hidden>
+<label>Usuario o código OAOA <input name="login" autocomplete="username" required></label>
+<label>Clase <input name="room" placeholder="Solo si entras con tu nombre"></label>
+<label>Contraseña <input name="password" type="password" autocomplete="current-password" required maxlength="64"></label>
+<button>Entrar</button></form><button id="logout" hidden>Cerrar sesión</button><form method="dialog"><button>Cerrar</button></form></dialog>
 <main>
 <div class="hero"><div><h1>El secreto de<br><em>las palabras</em></h1><p>Lee, escucha y descubre pistas entre los libros.</p><a class="cta" href="#curso">Elegir curso</a></div><img class="hero-art" src="ninos-leyendo.png" alt="Los dos compañeros de OAOA leen juntos con su uniforme"></div>
 <section id="curso"><h2>Elige tu curso</h2><nav id="courses" aria-label="Cursos"></nav><p id="availability"></p></section>
@@ -162,17 +166,95 @@ let soundOn = true
 let readerPoints = 0
 try { readerPoints = Number(localStorage.getItem('palabras-puntos')) || 0 } catch {}
 const panel = byId('panel')
+const service = 'https://script.google.com/macros/s/AKfycbwXIpo2w6cEz7JNNUDvssUJUCNebVaqckhK08VKLDdzCCYweZX1Q5X2R5r7k5j7Yim0/exec'
+const accountForm = byId('account-form')
+const accountStatus = byId('panel-content')
+const tokenKey = 'palabras-session-token'
+let token = sessionStorage.getItem(tokenKey) ?? ''
+let sessionChannel
+if ('BroadcastChannel' in window) {
+  sessionChannel = new BroadcastChannel('palabras-session')
+  sessionChannel.onmessage = ({data}) => {
+    if (data?.kind === 'request' && token) sessionChannel.postMessage({kind:'session', token})
+    if (data?.kind === 'session' && /^[a-f0-9]{64}$/.test(data.token)) setToken(data.token)
+    if (data?.kind === 'logout') setToken('')
+  }
+  if (!token) sessionChannel.postMessage({kind:'request'})
+}
+function setToken(value) {
+  token = value
+  if (value) sessionStorage.setItem(tokenKey, value)
+  else sessionStorage.removeItem(tokenKey)
+}
+async function rpc(action, body = {}) {
+  const response = await fetch(service, {
+    method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    credentials: 'omit', body: JSON.stringify({action, body, token}),
+    signal: AbortSignal.timeout(30000)
+  })
+  if (!response.ok) throw Error('No se pudo conectar con el servidor de Lengua.')
+  const result = await response.json()
+  if (result.status >= 400) throw Error(result.status === 503 ? 'El servidor de Lengua no está disponible en este momento.' : result.body.error)
+  return result.body
+}
+function showAccount(account, stats) {
+  accountForm.hidden = Boolean(account)
+  byId('logout').hidden = !account
+  accountStatus.textContent = account
+    ? 'Hola, ' + account.name + '. Has completado ' + (stats?.played ?? 0) + ' partidas y tienes ' + (stats?.coins ?? 0) + ' monedas de Lengua.'
+    : 'Entra con tu cuenta de OAOA.'
+}
+accountForm.onsubmit = async event => {
+  event.preventDefault()
+  const submit = event.submitter
+  submit.disabled = true
+  accountStatus.textContent = 'Comprobando tu cuenta…'
+  const body = Object.fromEntries(new FormData(accountForm))
+  accountForm.elements.password.value = ''
+  try {
+    const result = await rpc('login', body)
+    setToken(result.sessionToken)
+    sessionChannel?.postMessage({kind:'session', token})
+    accountForm.reset()
+    showAccount(result.account, result.stats)
+  } catch (error) {
+    accountStatus.textContent = error instanceof TypeError ? 'No se pudo conectar con el servidor de Lengua.' : error.message
+  } finally { submit.disabled = false }
+}
+byId('logout').onclick = async () => {
+  try { await rpc('logout') } catch {
+    accountStatus.textContent = 'No se pudo cerrar la sesión. Vuelve a intentarlo.'
+    return
+  }
+  setToken('')
+  sessionChannel?.postMessage({kind:'logout'})
+  showAccount(null)
+}
 for (const control of document.querySelectorAll('[data-panel]')) {
-  control.onclick = () => {
+  control.onclick = async () => {
+    accountForm.hidden = true
+    byId('logout').hidden = true
     const title = control.dataset.panel
     byId('panel-title').textContent = title
     byId('panel-content').textContent = {
       'Ranking': 'Clasificación de Lengua · Este dispositivo: ' + readerPoints + ' puntos. La clasificación entre jugadores requiere conectar las cuentas.',
-      'Mi cuenta': 'Podrás entrar con tu cuenta de OAOA cuando esté habilitada la conexión con Apps Script.',
+      'Mi cuenta': 'Comprobando la sesión…',
       'Profesor': 'El acceso docente y el seguimiento por curso se habilitarán al conectar Apps Script.',
       'Cómo se juega': 'Elige un curso, abre un tema y selecciona una actividad. Usa Cambiar de juego para volver al menú del tema.'
     }[title]
     panel.showModal()
+    if (title === 'Mi cuenta') {
+      try {
+        const result = await rpc('me')
+        if (!result.account && token) setToken('')
+        if (panel.open && byId('panel-title').textContent === title) showAccount(result.account, result.stats)
+      } catch {
+        if (panel.open && byId('panel-title').textContent === title) {
+          accountStatus.textContent = 'No se pudo comprobar la sesión. Puedes volver a intentar el acceso.'
+          accountForm.hidden = false
+        }
+      }
+    }
   }
 }
 byId('sound').onclick = () => {
