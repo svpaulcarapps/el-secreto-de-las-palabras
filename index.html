@@ -113,6 +113,13 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 #player-details{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.35rem 1rem}
 #player-details dt{font-weight:700}#player-details dd{margin:0}
 @media(max-width:680px){#player-account .account-selectors{grid-template-columns:1fr 1fr}#player-account .account-selectors label:first-child{grid-column:1/-1}}
+
+#teacher-form{margin-bottom:1rem}
+#teacher-form input,#teacher-form select{display:block;max-width:100%;min-height:42px;padding:.45rem;font:inherit;border:1px solid #adbdcf;border-radius:8px;background:#fff;color:#172e49}
+.results-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem;text-align:left}
+.results-table td,.results-table th{padding:.55rem .4rem;border-bottom:1px solid #d9e1eb}
+.results-table tr[data-own]{background:#f9e8b7}
+#progress-state{margin:1rem 0;color:#344f6b}
 </style>
 </head>
 <body>
@@ -123,7 +130,18 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
 <span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
-<dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p><form method="dialog"><button>Cerrar</button></form></dialog>
+<dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p>
+<div id="panel-results"></div>
+<form id="teacher-form" hidden>
+<div class="account-selectors">
+<label>Colegio <select name="school" required></select></label>
+<label>Clase <select name="room" required></select></label>
+<label>Semana <input type="date" name="week" required></label>
+</div>
+<label>Clave de profesor de OAOA <input type="password" name="key" autocomplete="current-password" required></label>
+<button>Consultar repaso</button>
+</form>
+<form method="dialog"><button>Cerrar</button></form></dialog>
 <main>
 <section id="player-account" class="account-panel" aria-labelledby="account-title" hidden>
   <div class="panel-heading">
@@ -441,17 +459,102 @@ byId('logout').onclick = async () => {
   sessionChannel?.postMessage({kind:'logout'})
   showAccount(null)
 }
+const progressService = 'https://script.google.com/macros/s/AKfycbwXIpo2w6cEz7JNNUDvssUJUCNebVaqckhK08VKLDdzCCYweZX1Q5X2R5r7k5j7Yim0/exec'
+const progressRoutes = {
+  'Lecturas comprensivas':'lectura', 'Sustantivos':'sustantivos', 'Tipos de texto':'textos',
+  'Ortografía':'ortografia', 'Tipos de rima':'rima', 'Detective de faltas':'faltas',
+  'Ordena los versos':'versos', 'Completa el poema':'completa', 'Dictado en audio':'dictado'
+}
+const teacherForm = byId('teacher-form')
+const reportStatus = byId('panel-content')
+const panelResults = byId('panel-results')
+for (const option of accountSchool.options) teacherForm.elements.school.add(new Option(option.text, option.value))
+for (let grade=1; grade<=6; grade++) {
+  for (const letter of ['A','B','C','D']) teacherForm.elements.room.add(new Option(grade + 'º' + letter, grade + letter))
+}
+teacherForm.elements.school.value = accountSchool.value
+teacherForm.elements.room.value = accountRoom.value
+teacherForm.elements.week.value = new Intl.DateTimeFormat('sv-SE', {timeZone:'Europe/Madrid'}).format(new Date())
+async function progressRpc(action, body = {}) {
+  const response = await fetch(progressService, {
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, credentials:'omit',
+    body:JSON.stringify({action, body, token:action === 'teacherLengua' ? '' : token}),
+    signal:AbortSignal.timeout(35000)
+  })
+  const result = await response.json()
+  if (!response.ok || result.status >= 400 || !result.body) throw Error(result.body?.error || 'No se pudo conectar con Lengua.')
+  return result.body
+}
+function renderProgressTable(rows, teacher) {
+  const table = document.createElement('table')
+  table.className = 'results-table'
+  const headings = teacher ? ['Alumno','Partidas','Aciertos','Preguntas','Puntos'] : ['Puesto','Jugador','Puntos']
+  const lead = table.createTHead().insertRow()
+  for (const name of headings) {
+    const cell = document.createElement('th')
+    cell.scope = 'col'
+    cell.textContent = name
+    lead.append(cell)
+  }
+  const body = table.createTBody()
+  rows.forEach((row,index) => {
+    const line = body.insertRow()
+    if (row.own) line.dataset.own = ''
+    const values = teacher ? [row.name,row.played,row.correct,row.total,row.points] : [index + 1,row.name,row.points]
+    for (const value of values) line.insertCell().textContent = value
+  })
+  panelResults.replaceChildren(table)
+}
+let reportRevision = 0
+teacherForm.onsubmit = async event => {
+  event.preventDefault()
+  const revision = ++reportRevision
+  const submit = event.submitter
+  submit.disabled = true
+  const body = Object.fromEntries(new FormData(teacherForm))
+  teacherForm.elements.key.value = ''
+  reportStatus.textContent = 'Comprobando la clave y consultando la semana…'
+  panelResults.replaceChildren()
+  try {
+    const result = await progressRpc('teacherLengua', body)
+    if (revision !== reportRevision) return
+    const week = result.week?.split('-').reverse().join('/')
+    reportStatus.textContent = result.rows.length ? 'Semana del ' + week : 'Esta clase aún no tiene registros.'
+    if (result.rows.length) renderProgressTable(result.rows, true)
+  } catch (error) {
+    if (revision === reportRevision) reportStatus.textContent = 'No se pudo consultar la clase. Comprueba la clave y vuelve a intentarlo.'
+  } finally { submit.disabled = false }
+}
+async function showRanking(revision) {
+  if (!token) {
+    reportStatus.textContent = 'Entra con tu cuenta de OAOA para ver el ranking de tu clase. En este dispositivo: ' + readerPoints + ' puntos de práctica.'
+    panelResults.append(button('Ir a Mi cuenta', () => { panel.close(); openAccount() }))
+    return
+  }
+  try {
+    const result = await progressRpc('rankingLengua')
+    if (revision !== reportRevision) return
+    reportStatus.textContent = 'Ranking de Lengua de tu clase. Cuenta tu mejor resultado en cada prueba.'
+    renderProgressTable(result.rows, false)
+  } catch {
+    if (revision === reportRevision) reportStatus.textContent = 'No se pudo consultar el ranking. Comprueba que tu sesión siga abierta.'
+  }
+}
 for (const control of document.querySelectorAll('[data-panel]')) {
   control.onclick = () => {
     const title = control.dataset.panel
     if (title === 'Mi cuenta') return openAccount()
+    const revision = ++reportRevision
+    teacherForm.hidden = title !== 'Profesor'
+    panelResults.replaceChildren()
     byId('panel-title').textContent = title
     byId('panel-content').textContent = {
-      'Ranking': 'Clasificación de Lengua · Este dispositivo: ' + readerPoints + ' puntos.',
-      'Profesor': 'El acceso docente y el seguimiento por curso están en preparación.',
+      'Ranking': 'Cargando el ranking de Lengua…',
+      'Profesor': 'Elige la clase y la semana. Usa la misma clave docente que en OAOA.',
       'Cómo se juega': 'Elige un curso, abre un tema y selecciona una actividad. Usa Cambiar de juego para volver al menú del tema.'
     }[title]
     panel.showModal()
+    if (title === 'Ranking') showRanking(revision)
   }
 }
 byId('sound').onclick = () => {
@@ -469,7 +572,33 @@ const levels = ['Empiezo', 'Avanzo', 'Reto', 'Experto']
 const levelHelp = ['Preguntas guiadas con una pista.', 'Más preguntas y opciones de respuesta.', 'Retos en orden aleatorio y sin pista inicial.', 'Corrige la palabra con falta en el reto de ortografía.']
 const palette = [['#ffe9af','#c79443'],['#d9efce','#8cb27a'],['#d9edff','#85afd3'],['#eadfff','#a58ac8'],['#ffdfd9','#ce9589'],['#d0efe8','#76a99b']]
 let level = Math.max(0, levels.indexOf(params.get('nivel')))
-let active, round, activities, queue, dictationPlayer, selectedCourse, dedicatedPage = false
+let active, round, activities, queue, dictationPlayer, selectedCourse, run, dedicatedPage = false
+function recordAttempt(correct) {
+  if (run && !run.answers.has(round)) run.answers.set(round, correct)
+}
+function completeRun() {
+  const route = progressRoutes[active]
+  if (!route || !run || !queue.length || !token) return
+  const completedRun = run
+  const body = {
+    id:completedRun.id, route, level:level + 1, total:queue.length,
+    correct:[...completedRun.answers.values()].filter(Boolean).length
+  }
+  const status = document.createElement('p')
+  status.id = 'progress-state'
+  status.setAttribute('role','status')
+  exercise.append(status)
+  const save = async () => {
+    status.replaceChildren(document.createTextNode('Guardando en Lengua…'))
+    try {
+      await progressRpc('saveLengua', body)
+      status.textContent = 'Partida guardada en tu cuenta de Lengua.'
+    } catch {
+      status.replaceChildren(document.createTextNode('No se pudo guardar la partida. '), button('Reintentar', save))
+    }
+  }
+  save()
+}
 function shuffled(items) {
   const result = [...items]
   for (let i = result.length - 1; i > 0; i--) {
@@ -563,6 +692,7 @@ function selectUnit(unit, course, unitIndex) {
 function startGame(name) {
   active = name
   round = 0
+  run = {id:crypto.randomUUID(), answers:new Map()}
   const bank = activities[name]
   queue = name === 'Lecturas comprensivas' ? [...bank].sort((a, b) => a[0].localeCompare(b[0])) : shuffled(bank)
   if (level === 0 && !['Dictado en audio', 'Lecturas comprensivas'].includes(name)) queue = queue.slice(0, 3)
@@ -673,7 +803,8 @@ function render() {
   if (active === 'Dictado en audio') {
     if (round === activities[active].length) {
       paragraph('¡Has terminado los dictados!', 'h3')
-      exercise.append(button('Volver a practicar', () => { round = 0; render() }))
+      completeRun()
+      exercise.append(button('Volver a practicar', () => startGame(active)))
       return
     }
     const sentence = queue[round]
@@ -695,8 +826,9 @@ function render() {
     exercise.append(button('Escuchar dictado', () => play(1)),
       document.createTextNode(' '), button('Escuchar más despacio', () => play(0.82)), label,
       button('Comprobar', () => {
-        feedback.textContent = normalizeDictation(input.value, selectedCourse) === normalizeDictation(sentence, selectedCourse)
-          ? '¡Dictado correcto!'
+        const correct = normalizeDictation(input.value, selectedCourse) === normalizeDictation(sentence, selectedCourse)
+        if (input.value.trim()) recordAttempt(correct)
+        feedback.textContent = correct ? '¡Dictado correcto!'
           : !input.value.trim() ? 'Escribe la frase antes de comprobarla.'
           : selectedCourse <= 3 ? 'Revisa las palabras, las mayúsculas y los signos. Puedes escuchar de nuevo.'
           : 'Revisa las palabras, las tildes, las mayúsculas y los signos. Puedes escuchar de nuevo.'
@@ -707,7 +839,8 @@ function render() {
   const questions = queue
   if (round === questions.length) {
     paragraph('¡Has terminado esta actividad!', 'h3')
-    exercise.append(button('Volver a jugar', () => { round = 0; render() }))
+    completeRun()
+    exercise.append(button('Volver a jugar', () => startGame(active)))
     return
   }
   paragraph('Reto ' + (round + 1) + ' de ' + questions.length)
@@ -730,7 +863,9 @@ function render() {
     }
     exercise.append(choices, lineList, button('Comprobar orden', () => {
       if (chosen.length < verses.length) { feedback.textContent = 'Elige todos los versos.'; return }
-      if (chosen.every((verse, index) => verse === verses[index])) {
+      const correct = chosen.every((verse, index) => verse === verses[index])
+      recordAttempt(correct)
+      if (correct) {
         feedback.textContent = '¡Bien! Has reconstruido la historia.'
         if (!byId('next')) { const next = button('Siguiente reto', advance); next.id = 'next'; exercise.append(next) }
       } else feedback.textContent = 'Prueba otra vez. Busca la pista que indica el comienzo.'
@@ -758,7 +893,9 @@ function render() {
     label.append(document.createTextNode(' '), input)
     exercise.append(label, button('Comprobar', () => {
       const normalize = value => value.trim().replace(/[.,!?]+$/, '').normalize('NFC')
-      if (normalize(input.value) !== normalize(correction)) { feedback.textContent = 'Prueba otra vez.'; return }
+      const correct = normalize(input.value) === normalize(correction)
+      if (input.value.trim()) recordAttempt(correct)
+      if (!correct) { feedback.textContent = 'Prueba otra vez.'; return }
       feedback.textContent = '¡Correcto! ' + explanation
       if (!byId('next')) { const next = button('Siguiente reto', advance); next.id = 'next'; exercise.append(document.createTextNode(' '), next) }
     }))
@@ -767,6 +904,7 @@ function render() {
   const order = shuffled(options.map((_, index) => index))
   for (const index of order) {
     answers.append(button(options[index], () => {
+      recordAttempt(index === 0)
       answers.children[order.indexOf(index)].classList.add(index === 0 ? 'answer-correct' : 'answer-wrong')
       feedback.textContent = index === 0 ? '¡Correcto! ' + explanation : 'Prueba otra vez.'
       if (index === 0 && !byId('next')) {
