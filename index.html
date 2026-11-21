@@ -51,18 +51,6 @@ footer a{display:inline-flex;align-items:center;gap:.45rem;color:#224d7c;font-we
 .answer-correct{outline:2px solid #397750}
 .answer-wrong{outline:2px solid #a4413b}
 
-.account-panel{padding:0;background:#fffdf5}
-.account-panel .panel-heading{display:flex;align-items:center;gap:1rem;padding:1.4rem 1.6rem;color:#fff;background:radial-gradient(ellipse at 14% 30%,#405c91,transparent 54%),#152c4c;border-bottom:3px solid #d7a74e}
-.account-panel h2{margin:0 0 .22rem;font-size:1.6rem}
-#account-subtitle{margin:0;color:#f5e3ad;font-size:.9rem;line-height:1.4}
-.account-panel #panel-content,.account-panel #account-form,.account-panel .panel-close{margin:1rem 1.6rem}
-.account-panel #panel-content{color:#35506e}
-#account-form label{display:grid;gap:.35rem;font-weight:700}
-#account-form label small{font-weight:400;color:#445e7b}
-#account-form input{min-width:0;min-height:44px;width:100%;font:inherit;padding:.65rem .8rem;border:1px solid #adbdcf;border-radius:.65rem;background:#fff;color:#172e49}
-#account-form button{width:100%}
-.account-panel #logout{margin:0 1.6rem}
-.panel-close button{background:#edf3fa;border-color:#bdcfe2}
 .reading-card{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:center;margin:16px 0}
 .reading-card blockquote{margin:0;line-height:1.65}
 .reading-card img,.poem-art{width:100%;max-height:220px;object-fit:cover;border:1px solid #dfcba2;border-radius:14px;display:block}
@@ -82,37 +70,10 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 #games a,#games button{background:linear-gradient(135deg,var(--game-bg),#fff);border:1px solid var(--game-edge);border-left:5px solid var(--game-edge);color:#172e49}
 #games a:hover,#games button:hover{background:var(--game-bg);box-shadow:0 4px 0 var(--game-edge)}
 #games .glyph{width:3em;height:3em}
-#account-form select{min-width:0;width:100%;min-height:44px;font:inherit;color:#172e49;background:#fff;border:1px solid #adbdcf;border-radius:.65rem;padding:.55rem}
 .account-selectors{display:grid;grid-template-columns:1fr 1fr;gap:0 .75rem}
 .account-selectors label:first-child{grid-column:1/-1}
-.account-help{font-size:.875rem;color:#445e7b}
 
-.account-panel .account-actions{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 1.6rem 1.4rem}
-.account-panel .panel-close{margin:0}
-.account-actions #try-characters{background:#edf3fa;border-color:#bdcfe2}
-#character-preview{margin:1rem 1.6rem;background:#eef4fa;border-radius:14px;padding:1rem;text-align:center}
-#character-preview .answers{justify-content:center}
-#character-preview h3{margin:.2rem 0 .6rem}
-#character-art{height:155px;width:94px;margin:auto;background:url('personajes-oaoa.webp') no-repeat -28px center;background-size:230px auto}
-#character-art.explorador{background-position:-117px center}
-#character-preview [aria-pressed=true]{background:#163454;color:white}
-#account-form .remember-account{display:flex;align-items:center;font-size:.9rem;gap:.45rem}
-#account-form .remember-account input{width:1.1rem;min-height:1.1rem}
 
-#player-account{max-width:860px;margin-inline:auto;overflow:hidden;box-shadow:0 12px 28px #263f5722;scroll-margin-top:1rem}
-#player-account h1{font-size:clamp(1.65rem,5vw,2.45rem);margin:0 0 .25rem}
-#player-account .panel-heading{padding:1.65rem clamp(1rem,4vw,2rem)}
-#player-account #account-form,#player-account #account-status{margin:1rem clamp(1rem,4vw,2rem)}
-#player-account #account-status{min-height:1.5em;color:#304b6d}
-#player-account .account-selectors{grid-template-columns:2fr 1fr 1fr}
-#player-account .account-selectors label:first-child{grid-column:auto}
-#player-account #account-form button{width:auto;min-width:130px}
-#player-account #logout{margin:0}
-#player-profile{margin:1rem 2rem;padding:1rem;display:flex;gap:1rem;align-items:center;background:#fff6de;border:1px solid #edd5a0;border-radius:16px}
-#player-avatar{width:92px;flex:none}#player-avatar svg{display:block;width:100%;height:auto}
-#player-details{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.35rem 1rem}
-#player-details dt{font-weight:700}#player-details dd{margin:0}
-@media(max-width:680px){#player-account .account-selectors{grid-template-columns:1fr 1fr}#player-account .account-selectors label:first-child{grid-column:1/-1}}
 
 #teacher-form{margin-bottom:1rem}
 #teacher-form input,#teacher-form select{display:block;max-width:100%;min-height:42px;padding:.45rem;font:inherit;border:1px solid #adbdcf;border-radius:8px;background:#fff;color:#172e49}
@@ -134,7 +95,12 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <div id="panel-results"></div>
 <form id="teacher-form" hidden>
 <div class="account-selectors">
-<label>Colegio <select name="school" required></select></label>
+<label>Colegio <select name="school" required>
+<option value="sv-cartagena">San Vicente de Paúl (Cartagena)</option>
+<option value="sc-cartagena">Sagrado Corazón (Cartagena)</option>
+<option value="sv-palmar">San Vicente de Paúl (El Palmar)</option>
+<option value="inmaculada-yecla">La Inmaculada (Yecla)</option>
+</select></label>
 <label>Clase <select name="room" required></select></label>
 <label>Semana <input type="date" name="week" required></label>
 </div>
@@ -143,40 +109,6 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 </form>
 <form method="dialog"><button>Cerrar</button></form></dialog>
 <main>
-<section id="player-account" class="account-panel" aria-labelledby="account-title" hidden>
-  <div class="panel-heading">
-    <img src="logo-lengua.png" alt="" width="72" height="72">
-    <div><h1 id="account-title" tabindex="-1">Entra en tu cuenta</h1><p id="account-subtitle">Usa tu cuenta de Aventuras Matemáticas para entrar en la biblioteca.</p></div>
-  </div>
-  <p id="account-status" role="status"></p>
-<form id="account-form" hidden>
-<label>Usuario o identificador <input name="login" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
-<div class="account-selectors">
-<label>Colegio <select name="school" required>
-<option value="sv-cartagena">San Vicente de Paúl (Cartagena)</option>
-<option value="sc-cartagena">Sagrado Corazón (Cartagena)</option>
-<option value="sv-palmar">San Vicente de Paúl (El Palmar)</option>
-<option value="inmaculada-yecla">La Inmaculada (Yecla)</option>
-</select></label>
-<label>Curso <select name="course" required></select></label>
-<label>Clase <select name="room" required></select></label>
-</div>
-<label>Contraseña <input name="password" type="password" autocomplete="current-password" required maxlength="64"></label>
-<label class="remember-account"><input name="remember" type="checkbox"> Recordar usuario en este dispositivo</label><button>Entrar</button><p class="account-help">¿Has olvidado tu contraseña? Pide a tu profesor que entre en Gestión de cuentas de OAOA.</p></form>
-  <div id="player-profile" hidden><div id="player-avatar" aria-hidden="true"></div><dl id="player-details"></dl></div>
-<div id="character-preview" hidden>
-<h3>Prueba los personajes</h3>
-<div id="character-art" role="img" aria-label="Exploradora de OAOA"></div>
-<div class="answers"><button data-character="exploradora" aria-pressed="true">Exploradora</button><button data-character="explorador" aria-pressed="false">Explorador</button></div>
-<p>Como invitado puedes probar el personaje. El avatar de tu cuenta se gestiona en OAOA.</p>
-</div>
-  <div class="account-actions">
-    <button id="account-return">Seguir como invitado</button>
-    <button id="try-characters" aria-controls="character-preview" aria-expanded="false" hidden>Probar personajes</button>
-    <a id="edit-shared-avatar" class="cta" href="https://svpaulcarapps.github.io/aventuras-matematicas/?avatar=lengua" hidden>Editar avatar</a>
-    <button id="logout" hidden>Salir de mi cuenta</button>
-  </div>
-</section>
 <div id="game-content">
 
 <div class="hero"><div><h1>El secreto de<br><em>las palabras</em></h1><p>Lee, escucha y descubre pistas entre los libros.</p><a class="cta" href="#curso">Elegir curso</a></div><img class="hero-art" src="ninos-leyendo.png" alt="Los dos compañeros de OAOA leen juntos con su uniforme"></div>
@@ -279,191 +211,14 @@ let soundOn = true
 let readerPoints = 0
 try { readerPoints = Number(localStorage.getItem('palabras-puntos')) || 0 } catch {}
 const panel = byId('panel')
-const service = 'https://script.google.com/macros/s/AKfycbzmig6AICLgEwQEpHXZt1Mkgc3opXDwvyDG1hSLKZMzZMzZqyf4ALBCoiL9AyapN4YC/exec'
-const accountForm = byId('account-form')
-const tryCharacters = byId('try-characters')
-const characterPreview = byId('character-preview')
-tryCharacters.onclick = () => {
-  characterPreview.hidden = !characterPreview.hidden
-  tryCharacters.setAttribute('aria-expanded', String(!characterPreview.hidden))
-}
-for (const control of document.querySelectorAll('[data-character]')) {
-  control.onclick = () => {
-    const character = control.dataset.character
-    byId('character-art').classList.toggle('explorador', character === 'explorador')
-    byId('character-art').setAttribute('aria-label', control.textContent + ' de OAOA')
-    for (const other of document.querySelectorAll('[data-character]')) other.setAttribute('aria-pressed', String(other === control))
-  }
-}
-const accountStatus = byId('account-status')
-const accountPage = byId('player-account')
-const accountTitle = byId('account-title')
-const accountLink = document.querySelector('[data-panel="Mi cuenta"]')
-const accountCourse = accountForm.elements.course
-const accountRoom = accountForm.elements.room
-const accountSchool = accountForm.elements.school
-for (let grade = 1; grade <= 6; grade++) accountCourse.add(new Option(grade + '.º Primaria', grade))
-function updateAccountRooms(preferred) {
-  const grade = accountCourse.value
-  accountRoom.replaceChildren(...['A','B','C','D'].map(letter => new Option(grade + 'º' + letter, grade + letter)))
-  if ([...accountRoom.options].some(option => option.value === preferred)) accountRoom.value = preferred
-}
-accountCourse.onchange = () => updateAccountRooms()
-let rememberedSchool = '', rememberedRoom = '', rememberedLogin = ''
-try {
-  rememberedLogin = localStorage.getItem('palabras-usuario') ?? ''
-  rememberedSchool = localStorage.getItem('palabras-colegio') ?? localStorage.getItem('oaoa-school') ?? ''
-  rememberedRoom = localStorage.getItem('palabras-clase') ?? localStorage.getItem('oaoa-room') ?? ''
-} catch {}
-if ([...accountSchool.options].some(option => option.value === rememberedSchool)) accountSchool.value = rememberedSchool
-accountCourse.value = /^[1-6][A-D]$/.test(rememberedRoom) ? rememberedRoom[0] : '3'
-updateAccountRooms(rememberedRoom)
-accountForm.elements.login.value = rememberedLogin
-accountForm.elements.remember.checked = Boolean(rememberedLogin)
+const oaoaAccountUrl = 'https://svpaulcarapps.github.io/aventuras-matematicas/?cuenta=lengua'
 const tokenKey = 'oaoa-session'
 let token = sessionStorage.getItem(tokenKey) || sessionStorage.getItem('palabras-oaoa-token') || ''
-if (token) setToken(token)
+if (token) sessionStorage.setItem(tokenKey, token)
 sessionStorage.removeItem('palabras-oaoa-token')
-let sessionChannel
-if ('BroadcastChannel' in window) {
-  sessionChannel = new BroadcastChannel('palabras-session')
-  sessionChannel.onmessage = ({data}) => {
-    if (data?.kind === 'request' && token) sessionChannel.postMessage({kind:'session', token})
-    if (data?.kind === 'session' && typeof data.token === 'string' && data.token.length > 0) setToken(data.token)
-    if (data?.kind === 'logout') setToken('')
-  }
-  if (!token) sessionChannel.postMessage({kind:'request'})
-}
-function setToken(value) {
-  token = value
-  if (value) sessionStorage.setItem(tokenKey, value)
-  else sessionStorage.removeItem(tokenKey)
-}
-async function rpc(action, body = {}) {
-  const response = await fetch(service, {
-    method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'},
-    credentials: 'omit',
-    body: JSON.stringify({
-      path: '/api/accounts', method: action === 'me' ? 'GET' : 'POST',
-      query: {}, headers: {}, token,
-      body: action === 'me' ? null : {action, ...body}
-    }),
-    signal: AbortSignal.timeout(30000)
-  })
-  if (!response.ok) throw Error('No se pudo conectar con el servidor de Lengua.')
-  const result = await response.json()
-  if (result.status >= 400) throw Error(result.status === 503 ? 'El servidor de Lengua no está disponible en este momento.' : result.body.error)
-  return result.body
-}
-let currentAccount = null
-function showAccount(account) {
-  currentAccount = account
-  accountForm.hidden = Boolean(account)
-  tryCharacters.hidden = Boolean(account)
-  byId('account-return').textContent = account ? '¡A jugar!' : 'Seguir como invitado'
-  byId('logout').hidden = !account
-  byId('edit-shared-avatar').hidden = !account
-  byId('player-profile').hidden = !account
-  accountTitle.textContent = account ? 'Hola, ' + account.name : 'Entra en tu cuenta'
-  byId('account-subtitle').textContent = account
-    ? 'Tu perfil de Aventuras Matemáticas'
-    : 'Usa tu cuenta de Aventuras Matemáticas para entrar en la biblioteca.'
-  accountStatus.textContent = account ? '' : 'Entra con tu cuenta de OAOA.'
-  if (!account) return
-  const details = byId('player-details')
-  details.replaceChildren()
-  const school = [...accountSchool.options].find(option => option.value === account.school)?.text
-  for (const [label, value] of [['Colegio', school], ['Clase', account.room], ['Usuario', account.username || account.code]]) {
-    if (!value) continue
-    const term = document.createElement('dt')
-    term.textContent = label
-    const description = document.createElement('dd')
-    description.textContent = value
-    details.append(term, description)
-  }
-  const avatar = byId('player-avatar')
-  avatar.replaceChildren()
-  import('https://svpaulcarapps.github.io/aventuras-matematicas/avatar.js?v=20261120-guia-v2')
-    .then(({avatarSvg}) => {
-      if (currentAccount !== account) return
-      const configuration = typeof account.avatar === 'string' ? JSON.parse(account.avatar) : account.avatar
-      const rendered = avatarSvg(configuration)
-      const doc = new DOMParser().parseFromString(rendered, 'text/html')
-      for (const element of doc.querySelectorAll('script, iframe, object, embed, foreignObject')) element.remove()
-      for (const element of doc.body.querySelectorAll('*')) {
-        for (const attribute of [...element.attributes]) {
-          if (/^on/i.test(attribute.name) || /^(javascript|vbscript):/i.test(attribute.value.trim())) {
-            element.removeAttribute(attribute.name)
-          } else if (/^(href|xlink:href|src)$/i.test(attribute.name) && /^assets\//.test(attribute.value)) {
-            element.setAttribute(attribute.name, new URL(attribute.value, 'https://svpaulcarapps.github.io/aventuras-matematicas/').href)
-          }
-        }
-      }
-      avatar.replaceChildren(...doc.body.childNodes)
-    })
-    .catch(() => {})
-}
-byId('account-return').onclick = () => {
-  accountPage.hidden = true
-  byId('game-content').hidden = false
-  accountLink.focus()
-}
-async function openAccount() {
+function openAccount() {
   stopAudio()
-  if (selectedCourse && !token && !accountForm.elements.remember.checked && accountCourse.value !== String(selectedCourse)) {
-    accountCourse.value = selectedCourse
-    updateAccountRooms()
-  }
-  characterPreview.hidden = true
-  tryCharacters.setAttribute('aria-expanded', 'false')
-  accountPage.hidden = false
-  byId('game-content').hidden = true
-  showAccount(currentAccount)
-  accountTitle.focus()
-  if (!token) return
-  accountStatus.textContent = 'Comprobando la sesión…'
-  try {
-    const result = await rpc('me')
-    if (!result.account) setToken('')
-    showAccount(result.account)
-  } catch {
-    showAccount(null)
-    accountStatus.textContent = 'No se pudo comprobar la sesión. Puedes volver a entrar.'
-  }
-}
-accountForm.onsubmit = async event => {
-  event.preventDefault()
-  const submit = event.submitter
-  submit.disabled = true
-  accountStatus.textContent = 'Comprobando tu cuenta…'
-  const {login, password, school, room, remember} = Object.fromEntries(new FormData(accountForm))
-  const body = {login, username:login, name:login, password, school, room}
-  try {
-    const result = await rpc('login', body)
-    if (!result.account || typeof result.sessionToken !== 'string' || !result.sessionToken) throw Error('No se pudo iniciar la sesión.')
-    setToken(result.sessionToken)
-    try {
-      if (remember) {
-        localStorage.setItem('palabras-usuario', login)
-        localStorage.setItem('palabras-clase', room)
-        localStorage.setItem('palabras-colegio', school)
-      } else for (const key of ['palabras-usuario','palabras-clase','palabras-colegio']) localStorage.removeItem(key)
-    } catch {}
-    accountForm.elements.password.value = ''
-    sessionChannel?.postMessage({kind:'session', token})
-    showAccount(result.account)
-  } catch (error) {
-    accountStatus.textContent = error instanceof TypeError ? 'No se pudo conectar con el servidor de Lengua.' : error.message
-  } finally { submit.disabled = false }
-}
-byId('logout').onclick = async () => {
-  try { await rpc('logout') } catch {
-    accountStatus.textContent = 'No se pudo cerrar la sesión. Vuelve a intentarlo.'
-    return
-  }
-  setToken('')
-  sessionChannel?.postMessage({kind:'logout'})
-  showAccount(null)
+  location.assign(oaoaAccountUrl)
 }
 const progressService = 'https://script.google.com/macros/s/AKfycbwXIpo2w6cEz7JNNUDvssUJUCNebVaqckhK08VKLDdzCCYweZX1Q5X2R5r7k5j7Yim0/exec'
 const progressRoutes = {
@@ -474,12 +229,15 @@ const progressRoutes = {
 const teacherForm = byId('teacher-form')
 const reportStatus = byId('panel-content')
 const panelResults = byId('panel-results')
-for (const option of accountSchool.options) teacherForm.elements.school.add(new Option(option.text, option.value))
 for (let grade=1; grade<=6; grade++) {
   for (const letter of ['A','B','C','D']) teacherForm.elements.room.add(new Option(grade + 'º' + letter, grade + letter))
 }
-teacherForm.elements.school.value = accountSchool.value
-teacherForm.elements.room.value = accountRoom.value
+try {
+  const school = localStorage.getItem('oaoa-school')
+  const room = localStorage.getItem('oaoa-room')
+  if ([...teacherForm.elements.school.options].some(option => option.value === school)) teacherForm.elements.school.value = school
+  teacherForm.elements.room.value = /^[1-6][A-D]$/.test(room) ? room : '3A'
+} catch {}
 teacherForm.elements.week.value = new Intl.DateTimeFormat('sv-SE', {timeZone:'Europe/Madrid'}).format(new Date())
 async function progressRpc(action, body = {}) {
   const response = await fetch(progressService, {
