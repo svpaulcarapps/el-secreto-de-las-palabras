@@ -173,6 +173,7 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
   <div class="account-actions">
     <button id="account-return">Seguir como invitado</button>
     <button id="try-characters" aria-controls="character-preview" aria-expanded="false" hidden>Probar personajes</button>
+    <a id="edit-shared-avatar" class="cta" href="https://svpaulcarapps.github.io/aventuras-matematicas/?avatar=lengua" hidden>Editar avatar</a>
     <button id="logout" hidden>Salir de mi cuenta</button>
   </div>
 </section>
@@ -361,6 +362,7 @@ function showAccount(account) {
   tryCharacters.hidden = Boolean(account)
   byId('account-return').textContent = account ? '¡A jugar!' : 'Seguir como invitado'
   byId('logout').hidden = !account
+  byId('edit-shared-avatar').hidden = !account
   byId('player-profile').hidden = !account
   accountTitle.textContent = account ? 'Hola, ' + account.name : 'Entra en tu cuenta'
   byId('account-subtitle').textContent = account
@@ -390,7 +392,11 @@ function showAccount(account) {
       for (const element of doc.querySelectorAll('script, iframe, object, embed, foreignObject')) element.remove()
       for (const element of doc.body.querySelectorAll('*')) {
         for (const attribute of [...element.attributes]) {
-          if (/^on/i.test(attribute.name) || /^(javascript|vbscript):/i.test(attribute.value.trim())) element.removeAttribute(attribute.name)
+          if (/^on/i.test(attribute.name) || /^(javascript|vbscript):/i.test(attribute.value.trim())) {
+            element.removeAttribute(attribute.name)
+          } else if (/^(href|xlink:href|src)$/i.test(attribute.name) && /^assets\//.test(attribute.value)) {
+            element.setAttribute(attribute.name, new URL(attribute.value, 'https://svpaulcarapps.github.io/aventuras-matematicas/').href)
+          }
         }
       }
       avatar.replaceChildren(...doc.body.childNodes)
@@ -939,6 +945,7 @@ function openActivityPage(unit, course, unitIndex, name) {
 if (requestedGame && requestedUnit?.activities && Object.hasOwn(requestedUnit.activities, requestedGame)) {
   openActivityPage(requestedUnit, requestedCourse, requestedUnitIndex, requestedGame)
 }
+if (params.get('cuenta') === '1') openAccount()
 window.addEventListener('popstate', () => location.reload())
 </script>
 </body>
