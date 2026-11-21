@@ -459,6 +459,14 @@ function selectUnit(unit, course, unitIndex) {
       url.search = new URLSearchParams({curso: course, unidad: unitIndex + 1, prueba: name, nivel: levels[level]})
       item.href = url.href
       item.textContent = name
+      item.onclick = event => {
+        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+        event.preventDefault()
+        params.set('curso', String(course))
+        params.set('unidad', String(unitIndex + 1))
+        history.pushState(null, '', url)
+        openActivityPage(unit, course, unitIndex, name)
+      }
     }
     const colors = palette[icons[name] % palette.length]
     item.style.setProperty('--game-bg', colors[0])
@@ -710,13 +718,18 @@ for (const [selector, icon] of [['#sound', 8], ['[data-panel="Ranking"]', 10], [
 const requestedCourse = Number(params.get('curso'))
 const requestedUnitIndex = Number(params.get('unidad')) - 1
 const requestedUnit = courses[requestedCourse]?.[requestedUnitIndex]
-if (requestedGame && requestedUnit?.activities && Object.hasOwn(requestedUnit.activities, requestedGame)) {
+function openActivityPage(unit, course, unitIndex, name) {
   dedicatedPage = true
   document.querySelector('.hero').hidden = true
   byId('curso').hidden = true
-  selectUnit(requestedUnit, requestedCourse, requestedUnitIndex)
-  startGame(requestedGame)
+  byId('units').hidden = true
+  selectUnit(unit, course, unitIndex)
+  startGame(name)
 }
+if (requestedGame && requestedUnit?.activities && Object.hasOwn(requestedUnit.activities, requestedGame)) {
+  openActivityPage(requestedUnit, requestedCourse, requestedUnitIndex, requestedGame)
+}
+window.addEventListener('popstate', () => location.reload())
 </script>
 </body>
 </html>
