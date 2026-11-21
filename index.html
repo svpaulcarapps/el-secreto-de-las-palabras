@@ -703,6 +703,12 @@ function openActivityPage(unit, course, unitIndex, name) {
 if (requestedGame && requestedUnit?.activities && Object.hasOwn(requestedUnit.activities, requestedGame)) {
   openActivityPage(requestedUnit, requestedCourse, requestedUnitIndex, requestedGame)
 }
+const linkedPanel = params.get('panel')
+if (['Ranking','Profesor','Cómo se juega'].includes(linkedPanel)) {
+  document.querySelectorAll('[data-panel]').forEach(control => {
+    if (control.dataset.panel === linkedPanel) control.click()
+  })
+}
 if (params.get('cuenta') === '1') openAccount()
 window.addEventListener('popstate', () => location.reload())
 </script>
