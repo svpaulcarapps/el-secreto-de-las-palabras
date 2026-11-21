@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>El secreto de las palabras</title>
+<title>El secreto de las palabras</title><link rel="icon" href="logo-lengua.png">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#e9f1fa;color:#172e49;font:17px system-ui,sans-serif}header,main{max-width:1080px;margin:auto;padding:20px}header{font-weight:800}.hero,section{border-radius:24px;padding:clamp(22px,5vw,55px);margin-bottom:22px}.hero{color:#fff;background:radial-gradient(ellipse at 85% 35%,#a66847,transparent 55%),linear-gradient(110deg,#152842,#30395b);display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px}h1{font-size:clamp(2.5rem,7vw,5.5rem);line-height:1;margin:0}h1 em{color:#ffdc83;font-style:normal}.books{font-size:clamp(3rem,12vw,8rem)}section{background:#fffdf5;border:1px solid #ded6bf}button,a.cta{font:inherit;font-weight:700;color:#172e49;background:#ffdb81;border:1px solid #d0aa57;padding:.75rem 1rem;border-radius:12px;cursor:pointer;text-decoration:none}nav,.answers{display:flex;gap:10px;flex-wrap:wrap}button[aria-current=true]{background:#172e49;color:#fff}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #3a73b5;outline-offset:3px}textarea{width:100%;font:inherit;padding:12px;margin:12px 0}#feedback{min-height:1.5em;font-weight:700}blockquote{white-space:pre-line;margin:16px 0;padding:16px;background:#eef4ff;border-radius:12px}label{display:block;margin:12px 0}
 @media(max-width:480px){.hero{grid-template-columns:1fr}.books{display:none}}
 
+[hidden]{display:none!important}
 body{background:radial-gradient(ellipse at top right,#cbdff9,transparent 62%),#edf4fb}
 header{max-width:1240px;margin:18px auto 0;background:#fbfdff;border:1px solid #c5d6e9;border-radius:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 10px 25px #30568018}
 header nav{gap:4px}header button{background:transparent;border:0;padding:.6rem;font-size:.9rem}
@@ -27,16 +28,25 @@ dialog::backdrop{background:#13284099}
 
 .glyph.illustrated{background-color:transparent;background-image:url('iconos.png');background-size:400% 300%;background-position:var(--column) var(--row);border:0;box-shadow:none;border-radius:0;width:2.5em;height:2.5em}
 #courses button,#unit-list button{display:inline-flex;align-items:center;gap:.4rem}
+
+.brand{display:flex;align-items:center;gap:.85rem;color:inherit;text-decoration:none;font-size:.9rem;font-weight:500}
+.brand strong{font-size:1.25rem}
+header nav{align-items:center}
+.level-tag{font-size:.7rem;border-left:1px solid #c5d6e9;padding-left:.75rem}
+footer{max-width:1120px;margin:0 auto;padding:18px 20px 26px;border-top:1px solid #c5d6e9;display:flex;gap:1rem;flex-wrap:wrap;justify-content:space-between;font-size:.86rem}
+#games a{display:flex;align-items:center;gap:10px;min-height:72px;padding:.75rem 1rem;border-radius:12px;background:#fff;border:1px solid #d5c8ad;box-shadow:0 3px 0 #e5dccc;color:#172e49;font-weight:700;text-decoration:none}
+footer a{display:inline-flex;align-items:center;gap:.45rem;color:#224d7c;font-weight:700}
+#games a:hover,#games button:hover{background:#fff2cf}
 </style>
 </head>
 <body>
-<header><strong>📖 El secreto de las palabras</strong><nav aria-label="Menú principal">
+<header><a class="brand" href="./"><img src="logo-lengua.png" alt="" width="66" height="66"><span>Aventuras de Lengua<br><strong>El secreto de las palabras</strong></span></a><nav aria-label="Menú principal">
 <button id="sound" aria-pressed="true"><span class="glyph" aria-hidden="true">🔊</span>Sonido</button>
 <button data-panel="Ranking"><span class="glyph" aria-hidden="true">🏆</span>Ranking</button>
 <button data-panel="Mi cuenta"><span class="glyph" aria-hidden="true">👤</span>Mi cuenta</button>
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
-</nav></header>
+<span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
 <dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content"></p><form method="dialog"><button>Cerrar</button></form></dialog>
 <main>
 <div class="hero"><div><h1>El secreto de<br><em>las palabras</em></h1><p>Lee, escucha y descubre pistas entre los libros.</p><a class="cta" href="#curso">Elegir curso</a></div><img class="hero-art" src="ninos-leyendo.png" alt="Los dos compañeros de OAOA leen juntos con su uniforme"></div>
@@ -45,6 +55,7 @@ dialog::backdrop{background:#13284099}
 <section id="menu" hidden><h2 id="unit-title" tabindex="-1"></h2><p id="unit-description"></p><nav id="games" aria-label="Actividades"></nav></section>
 <section id="activity" hidden><button id="switch">Cambiar de juego</button><h2 id="title" tabindex="-1"></h2><div id="exercise"></div><p id="feedback" role="status"></p></section>
 </main>
+<footer><strong>★ El secreto de las palabras</strong><span>Lee. Escucha. Descubre.</span><span>Creador: Carlos Mercader Conesa</span><a href="https://svpaulcarapps.github.io/aventuras-matematicas/"><img src="https://svpaulcarapps.github.io/aventuras-matematicas/assets/art/oaoa-logo-v5.webp" alt="" width="28" height="28"> Aventuras Matemáticas ↗</a></footer>
 <script>
 const byId = id => document.getElementById(id)
 const button = (label, action) => {
@@ -70,27 +81,31 @@ const courses = {
   ],
   'Ortografía': [
     ['Elige la palabra que completa la frase. Guardé el lápiz en el ___.', '', ['estuche', 'estuge', 'estuce'], 'En estuche escribimos ch.'],
-    ['Elige la oración bien puntuada.', '', ['¿Dónde está mi cuaderno?', 'Dónde está mi cuaderno?', '¿Dónde está mi cuaderno.'], 'En español las preguntas llevan signos de apertura y cierre.']
+    ['Elige la oración bien puntuada.', '', ['¿Dónde está mi cuaderno?', 'Dónde está mi cuaderno?', '¿Dónde está mi cuaderno.'], 'En español las preguntas llevan signos de apertura y cierre.'],
+    ['Elige la frase con mayúsculas correctas.', '', ['Elena vive en Cartagena.', 'elena vive en Cartagena.', 'Elena vive en cartagena.'], 'Al inicio de la oración y en los nombres propios se escribe mayúscula.']
   ],
   'Sustantivos': [
     ['En «Lucía abrió el libro», ¿qué palabra es un nombre propio?', '', ['Lucía', 'libro', 'abrió'], 'Lucía identifica a una persona por su nombre.'],
     ['¿Cuál es el plural de lápiz?', '', ['lápices', 'lápizes', 'lápizs'], 'Al formar el plural de lápiz, cambiamos z por c y añadimos -es.'],
     ['«La gata dormía sobre los cojines».', '¿Qué sustantivo está en femenino singular?', ['gata', 'cojines', 'dormía'], 'Gata nombra un animal y está en femenino singular.'],
     ['«En Cartagena, Leo visitó una biblioteca».', '¿Qué dos palabras son nombres propios?', ['Cartagena y Leo', 'Leo y biblioteca', 'Cartagena y biblioteca'], 'Cartagena nombra una ciudad concreta y Leo nombra una persona.'],
-    ['El poema habla de varias ventanas.', '¿En qué género y número está «ventanas»?', ['Femenino plural', 'Femenino singular', 'Masculino plural'], 'Decimos las ventanas. El artículo las indica femenino plural.']
+    ['El poema habla de varias ventanas.', '¿En qué género y número está «ventanas»?', ['Femenino plural', 'Femenino singular', 'Masculino plural'], 'Decimos las ventanas. El artículo las indica femenino plural.'],
+    ['«Marta dejó las tijeras junto al papel».', '¿Qué pareja contiene dos nombres comunes?', ['tijeras y papel', 'Marta y tijeras', 'dejó y papel'], 'Tijeras y papel nombran objetos. Marta es un nombre propio y dejó es un verbo.']
   ],
   'Tipos de texto': [
     ['«El dragón bostezó y de su boca salió una nube de mariposas».', '¿En qué texto encontrarías este fragmento?', ['Un cuento', 'Una noticia', 'Unas instrucciones'], 'Es una escena imaginaria propia de un cuento.'],
     ['«Dobla la hoja por la mitad y recorta por la línea».', '¿Qué tipo de texto es?', ['Instrucciones', 'Poema', 'Cuento'], 'Indica los pasos que debes seguir.'],
     ['«Esta tarde, la biblioteca del colegio abrió una sala con veinte libros nuevos».', '¿Cuál es la finalidad de este texto?', ['Informar de un hecho', 'Enseñar a doblar papel', 'Contar una aventura imaginaria'], 'La frase informa de una novedad y aporta un dato concreto.'],
     ['«Por la ventana asoma\nuna luna de papel,\ny en silencio se acomoda\nen las páginas de miel».', '¿Qué pista ayuda a reconocer que es un poema?', ['Está escrito en versos', 'Tiene pasos numerados', 'Anuncia una fecha'], 'Cada línea del poema es un verso.'],
-    ['«Para devolver un libro, déjalo en la caja azul de la entrada».', '¿Es un texto literario o no literario?', ['No literario: da una indicación', 'Literario: cuenta un suceso inventado', 'Literario: presenta versos'], 'La frase indica qué hacer al devolver un libro.']
+    ['«Para devolver un libro, déjalo en la caja azul de la entrada».', '¿Es un texto literario o no literario?', ['No literario: da una indicación', 'Literario: cuenta un suceso inventado', 'Literario: presenta versos'], 'La frase indica qué hacer al devolver un libro.'],
+    ['«Se ha encontrado un estuche verde en el patio. Pregunta en conserjería».', '¿Para qué sirve este aviso?', ['Para informar y decir dónde preguntar', 'Para narrar una aventura', 'Para describir un paisaje en verso'], 'Comunica un hallazgo y explica qué hacer.']
   ],
   'Dictado en audio': ['Clara encontró un lápiz junto a la ventana.', '¿Dónde guardaste los libros de la biblioteca?', 'El dragón abrió la puerta con cuidado.'],
   'Completa el poema': [
     ['Sobre una hoja brillante\nse posó un pequeño _____.', 'Completa el verso con una palabra que rime y tenga sentido.', ['elefante', 'caracol', 'ratón'], 'Brillante y elefante riman desde la a tónica.'],
     ['Dejé mi libro en el suelo\ny soñé con tocar el _____.', 'Elige la palabra que rima con suelo.', ['cielo', 'mar', 'sol'], 'Suelo y cielo riman desde la e tónica.']
   ],
+  'Escribe tu poema': [],
   'Teoría': []
       }
     }
@@ -98,7 +113,7 @@ const courses = {
 }
 const icons = {
   'Lecturas comprensivas': 4, 'Ortografía': 5, 'Sustantivos': 6,
-  'Tipos de texto': 7, 'Completa el poema': 3, 'Dictado en audio': 8, 'Teoría': 9
+  'Tipos de texto': 7, 'Completa el poema': 3, 'Escribe tu poema': 3, 'Dictado en audio': 8, 'Teoría': 9
 }
 function addIcon(control, index) {
   const icon = document.createElement('span')
@@ -134,7 +149,9 @@ byId('sound').onclick = () => {
 const nav = byId('games')
 const exercise = byId('exercise')
 const feedback = byId('feedback')
-let active, round, activities
+const params = new URLSearchParams(location.search)
+const requestedGame = params.get('prueba')
+let active, round, activities, dedicatedPage = false
 for (let course = 1; course <= 6; course++) {
   const item = button(course + '.º Primaria', () => {
     for (const other of byId('courses').children) other.removeAttribute('aria-current')
@@ -153,7 +170,7 @@ for (let course = 1; course <= 6; course++) {
       const item = button(unit.title, () => {
         for (const other of unitList.children) other.removeAttribute('aria-current')
         item.setAttribute('aria-current', 'true')
-        selectUnit(unit)
+        selectUnit(unit, course, index)
       })
       addIcon(item, index + 1)
       unitList.append(item)
@@ -163,7 +180,7 @@ for (let course = 1; course <= 6; course++) {
   addIcon(item, 0)
   byId('courses').append(item)
 }
-function selectUnit(unit) {
+function selectUnit(unit, course, unitIndex) {
   stopAudio()
   byId('activity').hidden = true
   activities = unit.activities
@@ -174,21 +191,37 @@ function selectUnit(unit) {
   byId('unit-description').textContent = unit.description
   nav.replaceChildren()
   for (const name of Object.keys(activities)) {
-    const item = button(name, () => {
-      active = name
-      round = 0
-      byId('activity').hidden = false
-      render()
-      byId('title').focus()
-    })
+    const item = dedicatedPage ? button(name, () => startGame(name)) : document.createElement('a')
+    if (!dedicatedPage) {
+      const url = new URL(location.href)
+      url.hash = ''
+      url.search = new URLSearchParams({curso: course, unidad: unitIndex + 1, prueba: name})
+      item.href = url.href
+      item.target = '_blank'
+      item.rel = 'noopener'
+      item.textContent = name
+    }
     addIcon(item, icons[name])
     nav.append(item)
   }
   byId('unit-title').focus()
 }
+function startGame(name) {
+  active = name
+  round = 0
+  if (dedicatedPage) {
+    params.set('prueba', name)
+    history.replaceState(null, '', '?' + params)
+  }
+  byId('menu').hidden = dedicatedPage
+  byId('activity').hidden = false
+  render()
+  byId('title').focus()
+}
 byId('switch').onclick = () => {
   stopAudio()
   byId('activity').hidden = true
+  byId('menu').hidden = false
   nav.firstElementChild.focus()
 }
 function stopAudio() {
@@ -225,6 +258,24 @@ function render() {
   byId('title').textContent = active
   feedback.textContent = ''
   exercise.replaceChildren()
+  if (active === 'Escribe tu poema') {
+    paragraph('Imagina que un objeto del colegio cobra vida. Escribe cuatro versos que cuenten lo que hace.')
+    const label = document.createElement('label')
+    label.textContent = 'Tu poema'
+    const input = document.createElement('textarea')
+    input.rows = 5
+    label.append(input)
+    exercise.append(label, button('Revisar mis versos', () => {
+      const lines = input.value.split('\n').filter(line => line.trim()).length
+      feedback.textContent = lines === 4
+        ? '¡Ya tienes cuatro versos! Léelos en voz alta. ¿Puedes hacer rimar el segundo con el cuarto?'
+        : 'Has escrito ' + lines + ' de 4 versos. Escribe un verso por línea.'
+    }), document.createTextNode(' '), button('Leer mi poema', () => {
+      if (input.value.trim()) speak(input.value)
+      else feedback.textContent = 'Escribe tu poema antes de escucharlo.'
+    }))
+    return
+  }
   if (active === 'Teoría') {
     paragraph('Los sustantivos', 'h3')
     paragraph('Nombran personas, animales, lugares o cosas. Los comunes, como ciudad, sirven para cualquier miembro de un grupo. Los propios, como Cartagena, identifican a uno en particular y empiezan con mayúscula.')
@@ -288,6 +339,16 @@ function render() {
     }))
   }
   exercise.append(answers)
+}
+const requestedCourse = Number(params.get('curso'))
+const requestedUnitIndex = Number(params.get('unidad')) - 1
+const requestedUnit = courses[requestedCourse]?.[requestedUnitIndex]
+if (requestedGame && requestedUnit?.activities && Object.hasOwn(requestedUnit.activities, requestedGame)) {
+  dedicatedPage = true
+  document.querySelector('.hero').hidden = true
+  byId('curso').hidden = true
+  selectUnit(requestedUnit, requestedCourse, requestedUnitIndex)
+  startGame(requestedGame)
 }
 </script>
 </body>
