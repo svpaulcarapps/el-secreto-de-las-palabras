@@ -250,7 +250,7 @@ async function showCongratulations() {
   card.append(portrait,message)
   exercise.append(card)
   try {
-    const [{avatarSvg}, avatar] = await Promise.all([import(oaoaBase + 'avatar.js?v=20261121-capas-rojas'), loadPlayerAvatar()])
+    const [{avatarSvg}, avatar] = await Promise.all([import(oaoaBase + 'avatar.js?v=20261121-capirote'), loadPlayerAvatar()])
     if (!card.isConnected) return
     const svgText = avatarSvg({...avatar,motion:'thumb'}, 'Tu personaje te da la enhorabuena')
     const svg = new DOMParser().parseFromString(svgText,'image/svg+xml').documentElement
