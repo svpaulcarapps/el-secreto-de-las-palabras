@@ -227,7 +227,7 @@ byId('switch').onclick = () => {
 function stopAudio() {
   if ('speechSynthesis' in window) speechSynthesis.cancel()
 }
-function speak(value) {
+function speak(value, rate = 0.9) {
   if (!soundOn) {
     feedback.textContent = 'Activa Sonido en el menú superior para escuchar.'
     return
@@ -238,8 +238,17 @@ function speak(value) {
   }
   speechSynthesis.cancel()
   const utterance = new SpeechSynthesisUtterance(value)
-  utterance.lang = 'es-ES'
-  utterance.rate = 0.78
+  const voices = speechSynthesis.getVoices()
+  const spanish = voices.filter(voice => /^es(?:-|_)/i.test(voice.lang))
+  const natural = /natural|neural|premium|enhanced|mejorada|online/i
+  const castilian = spanish.filter(voice => /^es[-_]es$/i.test(voice.lang))
+  const preferred = castilian.find(voice => natural.test(voice.name)) ??
+    spanish.find(voice => natural.test(voice.name)) ??
+    castilian.find(voice => /^Google/i.test(voice.name)) ??
+    castilian[0] ?? spanish[0]
+  if (preferred) utterance.voice = preferred
+  utterance.lang = preferred?.lang ?? 'es-ES'
+  utterance.rate = rate
   utterance.onerror = () => { feedback.textContent = 'El audio no está disponible. Revisa la voz de español del navegador.' }
   speechSynthesis.speak(utterance)
 }
@@ -302,7 +311,8 @@ function render() {
     input.spellcheck = false
     label.append(input)
     const normalize = value => value.trim().replace(/\s+/g, ' ').normalize('NFC')
-    exercise.append(button('Escuchar o repetir', () => speak(sentence)), label,
+    exercise.append(button('Escuchar dictado', () => speak(sentence)),
+      document.createTextNode(' '), button('Escuchar más despacio', () => speak(sentence, 0.72)), label,
       button('Comprobar', () => {
         feedback.textContent = normalize(input.value) === sentence ? '¡Dictado correcto!' :
           input.value.trim() ? 'Revisa las mayúsculas, las tildes y los signos. Puedes escuchar de nuevo.' : 'Escribe la frase antes de comprobarla.'
