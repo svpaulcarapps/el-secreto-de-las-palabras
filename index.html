@@ -50,6 +50,45 @@ footer a{display:inline-flex;align-items:center;gap:.45rem;color:#224d7c;font-we
 #activity{background:linear-gradient(140deg,#fffdf4,#fff);border-color:#d2c09b}
 .answer-correct{outline:2px solid #397750}
 .answer-wrong{outline:2px solid #a4413b}
+
+.account-panel{padding:0;background:#fffdf5}
+.account-panel .panel-heading{display:flex;align-items:center;gap:1rem;padding:1.4rem 1.6rem;color:#fff;background:radial-gradient(ellipse at 14% 30%,#405c91,transparent 54%),#152c4c;border-bottom:3px solid #d7a74e}
+.account-panel h2{margin:0 0 .22rem;font-size:1.6rem}
+#account-subtitle{margin:0;color:#f5e3ad;font-size:.9rem;line-height:1.4}
+.account-panel #panel-content,.account-panel #account-form,.account-panel .panel-close{margin:1rem 1.6rem}
+.account-panel #panel-content{color:#35506e}
+#account-form label{display:grid;gap:.35rem;font-weight:700}
+#account-form label small{font-weight:400;color:#445e7b}
+#account-form input{min-width:0;min-height:44px;width:100%;font:inherit;padding:.65rem .8rem;border:1px solid #adbdcf;border-radius:.65rem;background:#fff;color:#172e49}
+#account-form button{width:100%}
+.account-panel #logout{margin:0 1.6rem}
+.panel-close button{background:#edf3fa;border-color:#bdcfe2}
+.reading-card{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:center;margin:16px 0}
+.reading-card blockquote{margin:0;line-height:1.65}
+.reading-card img,.poem-art{width:100%;max-height:220px;object-fit:cover;border:1px solid #dfcba2;border-radius:14px;display:block}
+.poem-art{max-width:420px}
+@media(max-width:620px){.reading-card{grid-template-columns:1fr}.reading-card img{max-height:160px}}
+
+header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center}
+header .brand{grid-column:1;grid-row:1}
+header nav{grid-column:3;grid-row:1;justify-content:flex-end}
+header .level-tag{grid-column:2;grid-row:1;justify-self:center;padding:.45rem .75rem;border:0;border-radius:999px;background:#eef4fb;white-space:nowrap;letter-spacing:.04em}
+@media(max-width:1030px){header nav{grid-column:1/-1;grid-row:2;justify-content:center}header .brand{grid-column:1/3}header .level-tag{grid-column:3;justify-self:end}}
+@media(max-width:550px){header{grid-template-columns:1fr}header .brand,header .level-tag,header nav{grid-column:1;justify-self:center}header .brand{grid-row:1}header .level-tag{grid-row:2}header nav{grid-row:3}}
+#account-form select{min-width:0;width:100%;min-height:44px;font:inherit;color:#172e49;background:#fff;border:1px solid #adbdcf;border-radius:.65rem;padding:.55rem}
+.account-selectors{display:grid;grid-template-columns:1fr 1fr;gap:0 .75rem}
+.account-selectors label:first-child{grid-column:1/-1}
+.account-help{font-size:.875rem;color:#445e7b}
+
+.account-panel .account-actions{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 1.6rem 1.4rem}
+.account-panel .panel-close{margin:0}
+.account-actions #try-characters{background:#edf3fa;border-color:#bdcfe2}
+#character-preview{margin:1rem 1.6rem;background:#eef4fa;border-radius:14px;padding:1rem;text-align:center}
+#character-preview .answers{justify-content:center}
+#character-preview h3{margin:.2rem 0 .6rem}
+#character-art{height:155px;width:94px;margin:auto;background:url('personajes-oaoa.webp') no-repeat -28px center;background-size:230px auto}
+#character-art.explorador{background-position:-117px center}
+#character-preview [aria-pressed=true]{background:#163454;color:white}
 </style>
 </head>
 <body>
@@ -59,12 +98,27 @@ footer a{display:inline-flex;align-items:center;gap:.45rem;color:#224d7c;font-we
 <button data-panel="Mi cuenta"><span class="glyph" aria-hidden="true">👤</span>Mi cuenta</button>
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
-<span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
-<dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p><form id="account-form" hidden>
-<label>Usuario o código OAOA <input name="login" autocomplete="username" required></label>
-<label>Clase <input name="room" placeholder="Solo si entras con tu nombre"></label>
+</nav><span class="level-tag">LENGUA · PRIMARIA</span></header>
+<dialog id="panel" aria-labelledby="panel-title"><div class="panel-heading"><img id="account-crest" src="logo-lengua.png" alt="" width="72" height="72" hidden><div><h2 id="panel-title"></h2><p id="account-subtitle" hidden>Tu cuenta de Aventuras Matemáticas también abre esta biblioteca.</p></div></div><p id="panel-content" role="status"></p><form id="account-form" hidden>
+<label>Usuario o identificador <input name="login" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+<div class="account-selectors">
+<label>Colegio <select name="school" required>
+<option value="sv-cartagena">San Vicente de Paúl (Cartagena)</option>
+<option value="sc-cartagena">Sagrado Corazón (Cartagena)</option>
+<option value="sv-palmar">San Vicente de Paúl (El Palmar)</option>
+<option value="inmaculada-yecla">La Inmaculada (Yecla)</option>
+</select></label>
+<label>Curso <select name="course" required></select></label>
+<label>Clase <select name="room" required></select></label>
+</div>
 <label>Contraseña <input name="password" type="password" autocomplete="current-password" required maxlength="64"></label>
-<button>Entrar</button></form><button id="logout" hidden>Cerrar sesión</button><form method="dialog"><button>Cerrar</button></form></dialog>
+<button>Entrar</button><p class="account-help">¿Has olvidado tu contraseña? Pide a tu profesor que entre en Gestión de cuentas de OAOA.</p></form><button id="logout" hidden>Cerrar sesión</button><div id="character-preview" hidden>
+<h3>Prueba los personajes</h3>
+<div id="character-art" role="img" aria-label="Exploradora de OAOA"></div>
+<div class="answers"><button data-character="exploradora" aria-pressed="true">Exploradora</button><button data-character="explorador" aria-pressed="false">Explorador</button></div>
+<p>Como invitado puedes probar el personaje. El avatar de tu cuenta se gestiona en OAOA.</p>
+</div><div class="account-actions"><form class="panel-close" method="dialog"><button id="panel-close-button">Cerrar</button></form>
+<button id="try-characters" type="button" aria-controls="character-preview" aria-expanded="false" hidden>Probar personajes</button></div></dialog>
 <main>
 <div class="hero"><div><h1>El secreto de<br><em>las palabras</em></h1><p>Lee, escucha y descubre pistas entre los libros.</p><a class="cta" href="#curso">Elegir curso</a></div><img class="hero-art" src="ninos-leyendo.png" alt="Los dos compañeros de OAOA leen juntos con su uniforme"></div>
 <section id="curso"><h2>Elige tu curso</h2><nav id="courses" aria-label="Cursos"></nav><p id="availability"></p></section>
@@ -168,7 +222,39 @@ try { readerPoints = Number(localStorage.getItem('palabras-puntos')) || 0 } catc
 const panel = byId('panel')
 const service = 'https://script.google.com/macros/s/AKfycbwXIpo2w6cEz7JNNUDvssUJUCNebVaqckhK08VKLDdzCCYweZX1Q5X2R5r7k5j7Yim0/exec'
 const accountForm = byId('account-form')
+const tryCharacters = byId('try-characters')
+const characterPreview = byId('character-preview')
+tryCharacters.onclick = () => {
+  characterPreview.hidden = !characterPreview.hidden
+  tryCharacters.setAttribute('aria-expanded', String(!characterPreview.hidden))
+}
+for (const control of document.querySelectorAll('[data-character]')) {
+  control.onclick = () => {
+    const character = control.dataset.character
+    byId('character-art').classList.toggle('explorador', character === 'explorador')
+    byId('character-art').setAttribute('aria-label', control.textContent + ' de OAOA')
+    for (const other of document.querySelectorAll('[data-character]')) other.setAttribute('aria-pressed', String(other === control))
+  }
+}
 const accountStatus = byId('panel-content')
+const accountCourse = accountForm.elements.course
+const accountRoom = accountForm.elements.room
+const accountSchool = accountForm.elements.school
+for (let grade = 1; grade <= 6; grade++) accountCourse.add(new Option(grade + '.º Primaria', grade))
+function updateAccountRooms(preferred) {
+  const grade = accountCourse.value
+  accountRoom.replaceChildren(...['A','B','C','D'].map(letter => new Option(grade + 'º' + letter, grade + letter)))
+  if ([...accountRoom.options].some(option => option.value === preferred)) accountRoom.value = preferred
+}
+accountCourse.onchange = () => updateAccountRooms()
+let rememberedSchool = '', rememberedRoom = ''
+try {
+  rememberedSchool = localStorage.getItem('oaoa-school') ?? ''
+  rememberedRoom = localStorage.getItem('oaoa-room') ?? ''
+} catch {}
+if ([...accountSchool.options].some(option => option.value === rememberedSchool)) accountSchool.value = rememberedSchool
+accountCourse.value = /^[1-6][A-D]$/.test(rememberedRoom) ? rememberedRoom[0] : '3'
+updateAccountRooms(rememberedRoom)
 const tokenKey = 'palabras-session-token'
 let token = sessionStorage.getItem(tokenKey) ?? ''
 let sessionChannel
@@ -199,6 +285,8 @@ async function rpc(action, body = {}) {
 }
 function showAccount(account, stats) {
   accountForm.hidden = Boolean(account)
+  tryCharacters.hidden = Boolean(account)
+  byId('panel-close-button').textContent = account ? 'Cerrar' : 'Seguir como invitado'
   byId('logout').hidden = !account
   accountStatus.textContent = account
     ? 'Hola, ' + account.name + '. Has completado ' + (stats?.played ?? 0) + ' partidas y tienes ' + (stats?.coins ?? 0) + ' monedas de Lengua.'
@@ -215,7 +303,6 @@ accountForm.onsubmit = async event => {
     const result = await rpc('login', body)
     setToken(result.sessionToken)
     sessionChannel?.postMessage({kind:'session', token})
-    accountForm.reset()
     showAccount(result.account, result.stats)
   } catch (error) {
     accountStatus.textContent = error instanceof TypeError ? 'No se pudo conectar con el servidor de Lengua.' : error.message
@@ -233,9 +320,20 @@ byId('logout').onclick = async () => {
 for (const control of document.querySelectorAll('[data-panel]')) {
   control.onclick = async () => {
     accountForm.hidden = true
+    tryCharacters.hidden = true
+    characterPreview.hidden = true
+    tryCharacters.setAttribute('aria-expanded', 'false')
     byId('logout').hidden = true
     const title = control.dataset.panel
-    byId('panel-title').textContent = title
+    byId('panel-title').textContent = title === 'Mi cuenta' ? 'Entra en tu cuenta' : title
+    byId('panel-close-button').textContent = title === 'Mi cuenta' ? 'Seguir como invitado' : 'Cerrar'
+    if (title === 'Mi cuenta' && selectedCourse && !token && accountCourse.value !== String(selectedCourse)) {
+      accountCourse.value = selectedCourse
+      updateAccountRooms()
+    }
+    panel.classList.toggle('account-panel', title === 'Mi cuenta')
+    byId('account-crest').hidden = title !== 'Mi cuenta'
+    byId('account-subtitle').hidden = title !== 'Mi cuenta'
     byId('panel-content').textContent = {
       'Ranking': 'Clasificación de Lengua · Este dispositivo: ' + readerPoints + ' puntos. La clasificación entre jugadores requiere conectar las cuentas.',
       'Mi cuenta': 'Comprobando la sesión…',
@@ -247,11 +345,12 @@ for (const control of document.querySelectorAll('[data-panel]')) {
       try {
         const result = await rpc('me')
         if (!result.account && token) setToken('')
-        if (panel.open && byId('panel-title').textContent === title) showAccount(result.account, result.stats)
+        if (panel.open && panel.classList.contains('account-panel')) showAccount(result.account, result.stats)
       } catch {
-        if (panel.open && byId('panel-title').textContent === title) {
+        if (panel.open && panel.classList.contains('account-panel')) {
           accountStatus.textContent = 'No se pudo comprobar la sesión. Puedes volver a intentar el acceso.'
           accountForm.hidden = false
+          tryCharacters.hidden = false
         }
       }
     }
@@ -272,7 +371,7 @@ const levels = ['Empiezo', 'Avanzo', 'Reto', 'Experto']
 const levelHelp = ['Preguntas guiadas con una pista.', 'Más preguntas y opciones de respuesta.', 'Retos en orden aleatorio y sin pista inicial.', 'Corrige la palabra con falta en el reto de ortografía.']
 const palette = [['#ffe9af','#c79443'],['#d9efce','#8cb27a'],['#d9edff','#85afd3'],['#eadfff','#a58ac8'],['#ffdfd9','#ce9589'],['#d0efe8','#76a99b']]
 let level = Math.max(0, levels.indexOf(params.get('nivel')))
-let active, round, activities, queue, dictationPlayer, dedicatedPage = false
+let active, round, activities, queue, dictationPlayer, selectedCourse, dedicatedPage = false
 function shuffled(items) {
   const result = [...items]
   for (let i = result.length - 1; i > 0; i--) {
@@ -312,6 +411,7 @@ for (let course = 1; course <= 6; course++) {
   byId('courses').append(item)
 }
 function selectUnit(unit, course, unitIndex) {
+  selectedCourse = course
   stopAudio()
   byId('activity').hidden = true
   activities = unit.activities
@@ -332,8 +432,6 @@ function selectUnit(unit, course, unitIndex) {
       url.hash = ''
       url.search = new URLSearchParams({curso: course, unidad: unitIndex + 1, prueba: name, nivel: levels[level]})
       item.href = url.href
-      item.target = '_blank'
-      item.rel = 'noopener'
       item.textContent = name
     }
     addIcon(item, icons[name])
@@ -409,10 +507,22 @@ function paragraph(value, tag = 'p') {
   element.textContent = value
   exercise.append(element)
 }
+function addExerciseArt(container, file) {
+  const image = document.createElement('img')
+  image.src = file
+  image.alt = ''
+  image.className = 'poem-art'
+  image.decoding = 'async'
+  container.append(image)
+}
 function advance() {
   round += 1
   render()
   byId('title').focus()
+}
+function normalizeDictation(value, course) {
+  const normalized = value.trim().replace(/\s+/g, ' ').normalize('NFC')
+  return course <= 3 ? normalized.normalize('NFD').replace(/\u0301/g, '').normalize('NFC') : normalized
 }
 function render() {
   stopAudio()
@@ -420,6 +530,7 @@ function render() {
   feedback.textContent = ''
   exercise.replaceChildren()
   if (active === 'Escribe tu poema') {
+    addExerciseArt(exercise, 'lectura-biblioteca.jpg')
     paragraph('Imagina que un objeto del colegio cobra vida. Escribe cuatro versos que cuenten lo que hace.')
     const label = document.createElement('label')
     label.textContent = 'Tu poema'
@@ -472,13 +583,15 @@ function render() {
     input.rows = 3
     input.spellcheck = false
     label.append(input)
-    const normalize = value => value.trim().replace(/\s+/g, ' ').normalize('NFC')
     exercise.append(button('Escuchar dictado', () => play(1)),
       document.createTextNode(' '), button('Escuchar más despacio', () => play(0.82)), label,
       button('Comprobar', () => {
-        feedback.textContent = normalize(input.value) === sentence ? '¡Dictado correcto!' :
-          input.value.trim() ? 'Revisa las mayúsculas, las tildes y los signos. Puedes escuchar de nuevo.' : 'Escribe la frase antes de comprobarla.'
-      }), document.createTextNode(' '), button('Ver solución', () => { feedback.textContent = sentence }),
+        feedback.textContent = normalizeDictation(input.value, selectedCourse) === normalizeDictation(sentence, selectedCourse)
+          ? '¡Dictado correcto!'
+          : !input.value.trim() ? 'Escribe la frase antes de comprobarla.'
+          : selectedCourse <= 3 ? 'Revisa las palabras, las mayúsculas y los signos. Puedes escuchar de nuevo.'
+          : 'Revisa las palabras, las tildes, las mayúsculas y los signos. Puedes escuchar de nuevo.'
+      }),
       document.createTextNode(' '), button('Siguiente dictado', advance))
     return
   }
@@ -516,8 +629,15 @@ function render() {
     return
   }
   const [text, question, options, explanation, correction] = questions[round]
-  paragraph(text, 'blockquote')
-  if (active === 'Lecturas comprensivas') exercise.append(button('Escuchar lectura', () => speak(text)))
+  if (active === 'Lecturas comprensivas') {
+    const reading = document.createElement('div')
+    reading.className = 'reading-card'
+    const poem = document.createElement('blockquote')
+    poem.textContent = text
+    reading.append(poem)
+    addExerciseArt(reading, text.startsWith('Un caracol') ? 'lectura-jardin.jpg' : 'lectura-biblioteca.jpg')
+    exercise.append(reading, button('Escuchar lectura', () => speak(text)))
+  } else paragraph(text, 'blockquote')
   if (question && !(level === 3 && correction)) paragraph(question)
   const answers = document.createElement('div')
   answers.className = 'answers'
