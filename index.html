@@ -135,10 +135,10 @@ const courses = {
     ['primavera / escalera', '¿Qué tipo de rima tienen?', ['Igual o consonante', 'Parecida o asonante', 'No riman'], 'Coinciden todos los sonidos de -era.']
   ],
   'Detective de faltas': [
-    ['el lunes visitamos la biblioteca.', 'Toca la palabra que tiene una falta.', ['el', 'lunes', 'biblioteca.'], 'Al principio de una oración se escribe El.'],
-    ['En cartagena hay una biblioteca.', 'Toca la palabra que tiene una falta.', ['cartagena', 'hay', 'biblioteca.'], 'Cartagena es un nombre propio y lleva mayúscula.'],
-    ['El pajaro se posó en la rama.', 'Toca la palabra que tiene una falta.', ['pajaro', 'posó', 'rama.'], 'Pájaro lleva tilde en la primera sílaba.'],
-    ['Comimos manzanas y peraz.', 'Toca la palabra que tiene una falta.', ['peraz.', 'Comimos', 'manzanas'], 'Se escribe peras, con s de plural.']
+    ['el lunes visitamos la biblioteca.', 'Toca la palabra que tiene una falta.', ['el', 'lunes', 'biblioteca.'], 'Al principio de una oración se escribe El.', 'El'],
+    ['En cartagena hay una biblioteca.', 'Toca la palabra que tiene una falta.', ['cartagena', 'hay', 'biblioteca.'], 'Cartagena es un nombre propio y lleva mayúscula.', 'Cartagena'],
+    ['El pajaro se posó en la rama.', 'Toca la palabra que tiene una falta.', ['pajaro', 'posó', 'rama.'], 'Pájaro lleva tilde en la primera sílaba.', 'pájaro'],
+    ['Comimos manzanas y peraz.', 'Toca la palabra que tiene una falta.', ['peraz.', 'Comimos', 'manzanas'], 'Se escribe peras, con s de plural.', 'peras']
   ],
   'Ordena los versos': [
     ['Ordena los versos para contar qué pasó primero, después y al final.', ['Primero encontré una semilla.', 'Después la planté en el patio.', 'Por fin abrió sus dos hojas.']],
@@ -269,7 +269,7 @@ const feedback = byId('feedback')
 const params = new URLSearchParams(location.search)
 const requestedGame = params.get('prueba')
 const levels = ['Empiezo', 'Avanzo', 'Reto', 'Experto']
-const levelHelp = ['Preguntas guiadas con una pista.', 'Más preguntas y opciones de respuesta.', 'Retos en orden aleatorio y sin pista inicial.', 'Escribe la palabra con falta en el reto de ortografía.']
+const levelHelp = ['Preguntas guiadas con una pista.', 'Más preguntas y opciones de respuesta.', 'Retos en orden aleatorio y sin pista inicial.', 'Corrige la palabra con falta en el reto de ortografía.']
 const palette = [['#ffe9af','#c79443'],['#d9efce','#8cb27a'],['#d9edff','#85afd3'],['#eadfff','#a58ac8'],['#ffdfd9','#ce9589'],['#d0efe8','#76a99b']]
 let level = Math.max(0, levels.indexOf(params.get('nivel')))
 let active, round, activities, queue, dictationPlayer, dedicatedPage = false
@@ -515,21 +515,21 @@ function render() {
     }), document.createTextNode(' '), button('Reiniciar orden', render))
     return
   }
-  const [text, question, options, explanation] = questions[round]
+  const [text, question, options, explanation, correction] = questions[round]
   paragraph(text, 'blockquote')
   if (active === 'Lecturas comprensivas') exercise.append(button('Escuchar lectura', () => speak(text)))
-  if (question) paragraph(question)
+  if (question && !(level === 3 && correction)) paragraph(question)
   const answers = document.createElement('div')
   answers.className = 'answers'
   if (level === 0 && active === 'Tipos de rima') paragraph('Pista: léelas en voz alta y compara los sonidos desde la vocal tónica.')
-  if (level === 3 && active === 'Detective de faltas') {
+  if (level === 3 && correction) {
     const label = document.createElement('label')
-    label.textContent = active === 'Detective de faltas' ? 'Escribe la palabra con falta tal como aparece' : 'Escribe la palabra que completa la rima'
+    label.textContent = 'Escribe la palabra correctamente'
     const input = document.createElement('input')
     label.append(document.createTextNode(' '), input)
     exercise.append(label, button('Comprobar', () => {
-      const normalize = value => value.trim().toLocaleLowerCase('es').replace(/[.,!?]+$/, '').normalize('NFC')
-      if (normalize(input.value) !== normalize(options[0])) { feedback.textContent = 'Prueba otra vez.'; return }
+      const normalize = value => value.trim().replace(/[.,!?]+$/, '').normalize('NFC')
+      if (normalize(input.value) !== normalize(correction)) { feedback.textContent = 'Prueba otra vez.'; return }
       feedback.textContent = '¡Correcto! ' + explanation
       if (!byId('next')) { const next = button('Siguiente reto', advance); next.id = 'next'; exercise.append(document.createTextNode(' '), next) }
     }))
