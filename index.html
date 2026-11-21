@@ -98,6 +98,21 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 #character-preview [aria-pressed=true]{background:#163454;color:white}
 #account-form .remember-account{display:flex;align-items:center;font-size:.9rem;gap:.45rem}
 #account-form .remember-account input{width:1.1rem;min-height:1.1rem}
+
+#player-account{max-width:860px;margin-inline:auto;overflow:hidden;box-shadow:0 12px 28px #263f5722;scroll-margin-top:1rem}
+#player-account h1{font-size:clamp(1.65rem,5vw,2.45rem);margin:0 0 .25rem}
+#player-account .panel-heading{padding:1.65rem clamp(1rem,4vw,2rem)}
+#player-account #account-form,#player-account #account-status{margin:1rem clamp(1rem,4vw,2rem)}
+#player-account #account-status{min-height:1.5em;color:#304b6d}
+#player-account .account-selectors{grid-template-columns:2fr 1fr 1fr}
+#player-account .account-selectors label:first-child{grid-column:auto}
+#player-account #account-form button{width:auto;min-width:130px}
+#player-account #logout{margin:0}
+#player-profile{margin:1rem 2rem;padding:1rem;display:flex;gap:1rem;align-items:center;background:#fff6de;border:1px solid #edd5a0;border-radius:16px}
+#player-avatar{width:92px;flex:none}#player-avatar svg{display:block;width:100%;height:auto}
+#player-details{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.35rem 1rem}
+#player-details dt{font-weight:700}#player-details dd{margin:0}
+@media(max-width:680px){#player-account .account-selectors{grid-template-columns:1fr 1fr}#player-account .account-selectors label:first-child{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -108,7 +123,15 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
 <span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
-<dialog id="panel" aria-labelledby="panel-title"><div class="panel-heading"><img id="account-crest" src="logo-lengua.png" alt="" width="72" height="72" hidden><div><h2 id="panel-title"></h2><p id="account-subtitle" hidden>Tu cuenta de Aventuras Matemáticas también abre esta biblioteca.</p></div></div><p id="panel-content" role="status"></p><form id="account-form" hidden>
+<dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p><form method="dialog"><button>Cerrar</button></form></dialog>
+<main>
+<section id="player-account" class="account-panel" aria-labelledby="account-title" hidden>
+  <div class="panel-heading">
+    <img src="logo-lengua.png" alt="" width="72" height="72">
+    <div><h1 id="account-title" tabindex="-1">Entra en tu cuenta</h1><p id="account-subtitle">Usa tu cuenta de Aventuras Matemáticas para entrar en la biblioteca.</p></div>
+  </div>
+  <p id="account-status" role="status"></p>
+<form id="account-form" hidden>
 <label>Usuario o identificador <input name="login" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
 <div class="account-selectors">
 <label>Colegio <select name="school" required>
@@ -121,20 +144,28 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <label>Clase <select name="room" required></select></label>
 </div>
 <label>Contraseña <input name="password" type="password" autocomplete="current-password" required maxlength="64"></label>
-<label class="remember-account"><input name="remember" type="checkbox"> Recordar usuario en este dispositivo</label><button>Entrar</button><p class="account-help">¿Has olvidado tu contraseña? Pide a tu profesor que entre en Gestión de cuentas de OAOA.</p></form><button id="logout" hidden>Cerrar sesión</button><div id="character-preview" hidden>
+<label class="remember-account"><input name="remember" type="checkbox"> Recordar usuario en este dispositivo</label><button>Entrar</button><p class="account-help">¿Has olvidado tu contraseña? Pide a tu profesor que entre en Gestión de cuentas de OAOA.</p></form>
+  <div id="player-profile" hidden><div id="player-avatar" aria-hidden="true"></div><dl id="player-details"></dl></div>
+<div id="character-preview" hidden>
 <h3>Prueba los personajes</h3>
 <div id="character-art" role="img" aria-label="Exploradora de OAOA"></div>
 <div class="answers"><button data-character="exploradora" aria-pressed="true">Exploradora</button><button data-character="explorador" aria-pressed="false">Explorador</button></div>
 <p>Como invitado puedes probar el personaje. El avatar de tu cuenta se gestiona en OAOA.</p>
-</div><div class="account-actions"><form class="panel-close" method="dialog"><button id="panel-close-button">Cerrar</button></form>
-<button id="try-characters" type="button" aria-controls="character-preview" aria-expanded="false" hidden>Probar personajes</button></div></dialog>
-<main>
+</div>
+  <div class="account-actions">
+    <button id="account-return">Seguir como invitado</button>
+    <button id="try-characters" aria-controls="character-preview" aria-expanded="false" hidden>Probar personajes</button>
+    <button id="logout" hidden>Salir de mi cuenta</button>
+  </div>
+</section>
+<div id="game-content">
+
 <div class="hero"><div><h1>El secreto de<br><em>las palabras</em></h1><p>Lee, escucha y descubre pistas entre los libros.</p><a class="cta" href="#curso">Elegir curso</a></div><img class="hero-art" src="ninos-leyendo.png" alt="Los dos compañeros de OAOA leen juntos con su uniforme"></div>
 <section id="curso"><h2>Elige tu curso</h2><nav id="courses" aria-label="Cursos"></nav><p id="availability"></p></section>
 <section id="units" hidden><h2 id="course-title" tabindex="-1"></h2><nav id="unit-list" aria-label="Temas"></nav><p id="unit-status" role="status"></p></section>
 <section id="menu" hidden><h2 id="unit-title" tabindex="-1"></h2><p id="unit-description"></p><nav id="levels" aria-label="Dificultad"></nav><p id="level-help"></p><nav id="games" aria-label="Actividades"></nav></section>
 <section id="activity" hidden><button id="switch">Cambiar de juego</button><h2 id="title" tabindex="-1"></h2><div id="exercise"></div><p id="feedback" role="status"></p></section>
-</main>
+</div></main>
 <footer><strong>★ El secreto de las palabras</strong><span>Lee. Escucha. Descubre.</span><span>Creador: Carlos Mercader Conesa</span><a href="https://svpaulcarapps.github.io/aventuras-matematicas/"><img src="https://svpaulcarapps.github.io/aventuras-matematicas/assets/art/oaoa-logo-v5.webp" alt="" width="28" height="28"> Aventuras Matemáticas ↗</a></footer>
 <script>
 const byId = id => document.getElementById(id)
@@ -245,7 +276,10 @@ for (const control of document.querySelectorAll('[data-character]')) {
     for (const other of document.querySelectorAll('[data-character]')) other.setAttribute('aria-pressed', String(other === control))
   }
 }
-const accountStatus = byId('panel-content')
+const accountStatus = byId('account-status')
+const accountPage = byId('player-account')
+const accountTitle = byId('account-title')
+const accountLink = document.querySelector('[data-panel="Mi cuenta"]')
 const accountCourse = accountForm.elements.course
 const accountRoom = accountForm.elements.room
 const accountSchool = accountForm.elements.school
@@ -267,8 +301,10 @@ accountCourse.value = /^[1-6][A-D]$/.test(rememberedRoom) ? rememberedRoom[0] : 
 updateAccountRooms(rememberedRoom)
 accountForm.elements.login.value = rememberedLogin
 accountForm.elements.remember.checked = Boolean(rememberedLogin)
-const tokenKey = 'palabras-oaoa-token'
-let token = sessionStorage.getItem(tokenKey) ?? ''
+const tokenKey = 'oaoa-session'
+let token = sessionStorage.getItem(tokenKey) || sessionStorage.getItem('palabras-oaoa-token') || ''
+if (token) setToken(token)
+sessionStorage.removeItem('palabras-oaoa-token')
 let sessionChannel
 if ('BroadcastChannel' in window) {
   sessionChannel = new BroadcastChannel('palabras-session')
@@ -300,14 +336,76 @@ async function rpc(action, body = {}) {
   if (result.status >= 400) throw Error(result.status === 503 ? 'El servidor de Lengua no está disponible en este momento.' : result.body.error)
   return result.body
 }
+let currentAccount = null
 function showAccount(account) {
+  currentAccount = account
   accountForm.hidden = Boolean(account)
   tryCharacters.hidden = Boolean(account)
-  byId('panel-close-button').textContent = account ? 'Cerrar' : 'Seguir como invitado'
+  byId('account-return').textContent = account ? '¡A jugar!' : 'Seguir como invitado'
   byId('logout').hidden = !account
-  accountStatus.textContent = account
-    ? 'Hola, ' + account.name + (account.room ? ' · Clase ' + account.room : '') + '. Ya puedes jugar con tu cuenta de OAOA.'
-    : 'Entra con tu cuenta de OAOA.'
+  byId('player-profile').hidden = !account
+  accountTitle.textContent = account ? 'Hola, ' + account.name : 'Entra en tu cuenta'
+  byId('account-subtitle').textContent = account
+    ? 'Tu perfil de Aventuras Matemáticas'
+    : 'Usa tu cuenta de Aventuras Matemáticas para entrar en la biblioteca.'
+  accountStatus.textContent = account ? '' : 'Entra con tu cuenta de OAOA.'
+  if (!account) return
+  const details = byId('player-details')
+  details.replaceChildren()
+  const school = [...accountSchool.options].find(option => option.value === account.school)?.text
+  for (const [label, value] of [['Colegio', school], ['Clase', account.room], ['Usuario', account.username || account.code]]) {
+    if (!value) continue
+    const term = document.createElement('dt')
+    term.textContent = label
+    const description = document.createElement('dd')
+    description.textContent = value
+    details.append(term, description)
+  }
+  const avatar = byId('player-avatar')
+  avatar.replaceChildren()
+  import('https://svpaulcarapps.github.io/aventuras-matematicas/avatar.js?v=20261120-guia-v2')
+    .then(({avatarSvg}) => {
+      if (currentAccount !== account) return
+      const configuration = typeof account.avatar === 'string' ? JSON.parse(account.avatar) : account.avatar
+      const rendered = avatarSvg(configuration)
+      const doc = new DOMParser().parseFromString(rendered, 'text/html')
+      for (const element of doc.querySelectorAll('script, iframe, object, embed, foreignObject')) element.remove()
+      for (const element of doc.body.querySelectorAll('*')) {
+        for (const attribute of [...element.attributes]) {
+          if (/^on/i.test(attribute.name) || /^(javascript|vbscript):/i.test(attribute.value.trim())) element.removeAttribute(attribute.name)
+        }
+      }
+      avatar.replaceChildren(...doc.body.childNodes)
+    })
+    .catch(() => {})
+}
+byId('account-return').onclick = () => {
+  accountPage.hidden = true
+  byId('game-content').hidden = false
+  accountLink.focus()
+}
+async function openAccount() {
+  stopAudio()
+  if (selectedCourse && !token && !accountForm.elements.remember.checked && accountCourse.value !== String(selectedCourse)) {
+    accountCourse.value = selectedCourse
+    updateAccountRooms()
+  }
+  characterPreview.hidden = true
+  tryCharacters.setAttribute('aria-expanded', 'false')
+  accountPage.hidden = false
+  byId('game-content').hidden = true
+  showAccount(currentAccount)
+  accountTitle.focus()
+  if (!token) return
+  accountStatus.textContent = 'Comprobando la sesión…'
+  try {
+    const result = await rpc('me')
+    if (!result.account) setToken('')
+    showAccount(result.account)
+  } catch {
+    showAccount(null)
+    accountStatus.textContent = 'No se pudo comprobar la sesión. Puedes volver a entrar.'
+  }
 }
 accountForm.onsubmit = async event => {
   event.preventDefault()
@@ -344,42 +442,16 @@ byId('logout').onclick = async () => {
   showAccount(null)
 }
 for (const control of document.querySelectorAll('[data-panel]')) {
-  control.onclick = async () => {
-    accountForm.hidden = true
-    tryCharacters.hidden = true
-    characterPreview.hidden = true
-    tryCharacters.setAttribute('aria-expanded', 'false')
-    byId('logout').hidden = true
+  control.onclick = () => {
     const title = control.dataset.panel
-    byId('panel-title').textContent = title === 'Mi cuenta' ? 'Entra en tu cuenta' : title
-    byId('panel-close-button').textContent = title === 'Mi cuenta' ? 'Seguir como invitado' : 'Cerrar'
-    if (title === 'Mi cuenta' && selectedCourse && !token && !accountForm.elements.remember.checked && accountCourse.value !== String(selectedCourse)) {
-      accountCourse.value = selectedCourse
-      updateAccountRooms()
-    }
-    panel.classList.toggle('account-panel', title === 'Mi cuenta')
-    byId('account-crest').hidden = title !== 'Mi cuenta'
-    byId('account-subtitle').hidden = title !== 'Mi cuenta'
+    if (title === 'Mi cuenta') return openAccount()
+    byId('panel-title').textContent = title
     byId('panel-content').textContent = {
-      'Ranking': 'Clasificación de Lengua · Este dispositivo: ' + readerPoints + ' puntos. La clasificación entre jugadores requiere conectar las cuentas.',
-      'Mi cuenta': 'Comprobando la sesión…',
-      'Profesor': 'El acceso docente y el seguimiento por curso se habilitarán al conectar Apps Script.',
+      'Ranking': 'Clasificación de Lengua · Este dispositivo: ' + readerPoints + ' puntos.',
+      'Profesor': 'El acceso docente y el seguimiento por curso están en preparación.',
       'Cómo se juega': 'Elige un curso, abre un tema y selecciona una actividad. Usa Cambiar de juego para volver al menú del tema.'
     }[title]
     panel.showModal()
-    if (title === 'Mi cuenta') {
-      try {
-        const result = await rpc('me')
-        if (!result.account && token) setToken('')
-        if (panel.open && panel.classList.contains('account-panel')) showAccount(result.account)
-      } catch {
-        if (panel.open && panel.classList.contains('account-panel')) {
-          accountStatus.textContent = 'No se pudo comprobar la sesión. Puedes volver a intentar el acceso.'
-          accountForm.hidden = false
-          tryCharacters.hidden = false
-        }
-      }
-    }
   }
 }
 byId('sound').onclick = () => {
