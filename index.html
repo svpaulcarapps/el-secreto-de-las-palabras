@@ -113,7 +113,8 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 
 <style>
 .svp-portal-link { display:inline-flex; align-items:center; gap:.3em; min-height:28px; padding:.15rem .45rem; border:1px solid transparent; border-radius:.45rem; color:inherit; background:transparent; text-decoration:none; font:600 12px/1.2 system-ui,sans-serif; }
-.svp-portal-link span { font-size:1em; }
+.svp-portal-link .juegos-icono { display:grid; grid-template-columns:repeat(2, 1fr); gap:2px; flex:none; width:13px; height:13px; }
+.juegos-icono i { background:#ffcc64; border:1px solid #8b5a20; border-radius:1.5px; }
 .svp-portal-link:hover { border-color:currentColor; text-decoration:underline; text-underline-offset:.15em; }
 .svp-portal-link:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 /* Cabecera del juego */
@@ -137,7 +138,7 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <button data-panel="Mi cuenta"><span class="glyph" aria-hidden="true">👤</span>Mi cuenta</button>
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
-<a class="svp-portal-link" href="https://svpaulcarapps.github.io/elige-tu-juego/"><span aria-hidden="true">←</span> Volver a juegos</a><span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
+<a class="svp-portal-link" href="https://svpaulcarapps.github.io/elige-tu-juego/"><span class="juegos-icono" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Volver a juegos</a><span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
 <dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p>
 <div id="panel-results"></div>
 <form id="teacher-form" hidden>
