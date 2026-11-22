@@ -112,9 +112,10 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 </style>
 
 <style>
-.svp-portal-link { display:inline-flex; align-items:center; min-height:32px; padding:0 9px; border-radius:7px; border:1px solid currentColor; color:inherit; background:transparent; text-decoration:none; font:600 13px system-ui,sans-serif; }
-.svp-portal-link:hover { text-decoration:underline; }
-.svp-portal-link:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.svp-portal-link { display:inline-flex; align-items:center; justify-content:center; gap:.45rem; min-height:36px; padding:.4rem .8rem; border:1px solid #edbd5d; border-radius:999px; background:linear-gradient(#294a81,#15284e); color:#fff1bf; box-shadow:0 2px 0 #162644; text-decoration:none; text-align:center; font:750 13px/1.2 system-ui,sans-serif; }
+.svp-portal-link span { font-size:1.25em; line-height:1; }
+.svp-portal-link:hover { background:linear-gradient(#395990,#203965); color:#fff; }
+.svp-portal-link:focus-visible { outline:2px solid #ca8414; outline-offset:3px; }
 </style>
 </head>
 <body>
@@ -124,7 +125,7 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <button data-panel="Mi cuenta"><span class="glyph" aria-hidden="true">👤</span>Mi cuenta</button>
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
-<a class="svp-portal-link" href="https://svpaulcarapps.github.io/elige-tu-juego/">Volver a juegos</a><span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
+<a class="svp-portal-link" href="https://svpaulcarapps.github.io/elige-tu-juego/"><span aria-hidden="true">←</span> Volver a Alma Mater Games</a><span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
 <dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p>
 <div id="panel-results"></div>
 <form id="teacher-form" hidden>
