@@ -116,10 +116,22 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 .svp-portal-link span { font-size:1em; }
 .svp-portal-link:hover { border-color:currentColor; text-decoration:underline; text-underline-offset:.15em; }
 .svp-portal-link:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+/* Cabecera del juego */
+.game-header { display:grid; grid-template-columns:minmax(0, 1fr) auto; width:calc(100% - 20px); margin-inline:auto; column-gap:1rem; row-gap:.5rem; }
+.game-header .brand { min-width:0; justify-self:start; }
+.game-header .brand img { flex:none; width:clamp(48px, 7vw, 76px); height:auto; aspect-ratio:1; }
+.game-header .brand strong { font-size:clamp(1rem, 2.15vw, 1.25rem); line-height:1.15; }
+.game-header nav { width:auto; min-width:0; justify-content:flex-end; }
+@media(max-width:1040px) {
+  .game-header { grid-template-columns:minmax(0, 1fr); padding:12px 16px; }
+  .game-header .brand { justify-self:center; }
+  .game-header nav { justify-content:center; gap:3px 8px; }
+  .game-header .level-tag { display:none; }
+}
 </style>
 </head>
 <body>
-<header><a class="brand" href="./"><img src="logo-lengua.png" alt="" width="66" height="66"><span>Aventuras de Lengua<br><strong>El secreto de las palabras</strong></span></a><nav aria-label="Menú principal">
+<header class="game-header"><a class="brand" href="./"><img src="logo-lengua.png" alt="" width="66" height="66"><span>Aventuras de Lengua<br><strong>El secreto de las palabras</strong></span></a><nav aria-label="Menú principal">
 <button id="sound" aria-pressed="true"><span class="glyph" aria-hidden="true">🔊</span>Sonido</button>
 <button data-panel="Ranking"><span class="glyph" aria-hidden="true">🏆</span>Ranking</button>
 <button data-panel="Mi cuenta"><span class="glyph" aria-hidden="true">👤</span>Mi cuenta</button>
