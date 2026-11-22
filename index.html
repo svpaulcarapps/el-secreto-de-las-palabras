@@ -91,6 +91,24 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 .completion-avatar .frame-1{animation-delay:.4s}.completion-avatar .frame-2{animation-delay:.8s}.completion-avatar .frame-3{animation-delay:1.2s}
 @keyframes celebration-frame{0%{visibility:visible}25%,100%{visibility:hidden}}
 @media(prefers-reduced-motion:reduce){.completion-avatar .sprite-frame{animation:none}.completion-avatar .frame-0{visibility:visible}}
+
+#ranking-page{background:#f8fbff;border:1px solid #c4d5e7;box-shadow:0 8px 24px #194f7a16}
+#ranking-page h1{font-size:clamp(2rem,5vw,3.25rem);line-height:1.1;margin:0 0 12px;color:#173553}
+#ranking-page p{line-height:1.55}
+.rank-filters{display:flex;align-items:end;flex-wrap:wrap;gap:16px;margin:20px 0}
+.rank-filters label{display:grid;gap:6px;font-weight:700;font-size:.9rem;color:#38546d}
+.rank-filters select{min-height:44px;padding:8px 12px;border:1px solid #adc3d9;border-radius:10px;background:white;color:#173553;font:inherit}
+#rank-refresh{background:#eef4fc;border-color:#afc6de}
+.ranking-table{margin:14px 0;padding:0;list-style:none}
+.ranking-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center;min-height:76px;margin:8px 0;padding:12px 18px;border:1px solid #d2dfec;border-radius:13px;background:#fff}
+.ranking-row[data-own]{border-color:#d7ac50;background:#fff7db}.ranking-row strong{color:#8b5406}.ranking-row small{display:block;color:#526e82}
+.empty-state{padding:.8rem 1rem;border:1px solid #d8c185;border-radius:12px;background:#fff6d7;color:#625125}
+.empty-state:empty{display:none}
+#rank-home{margin-top:14px}
+#games{grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr));gap:16px}
+#games a,#games button{min-height:152px;padding:1.1rem;justify-content:flex-start;text-align:left;gap:14px}
+#games .glyph{width:3.75rem;height:3.75rem}
+.game-card-copy{display:grid;gap:.4rem}.game-card-copy strong{font-size:1.25rem;line-height:1.15}.game-card-copy small{font-size:.9rem;font-weight:500;color:#354c64}
 </style>
 </head>
 <body>
@@ -119,6 +137,19 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 </form>
 <form method="dialog"><button>Cerrar</button></form></dialog>
 <main>
+<section id="ranking-page" hidden aria-labelledby="ranking-title">
+  <h1 id="ranking-title" tabindex="-1">🏆 Nuestro ranking</h1>
+  <p>Ganas puntos por acertar. Con al menos un 80 % de aciertos puedes sumar hasta 50 puntos por rapidez. El tiempo nunca resta puntos.</p>
+  <p>El ranking suma tu mejor resultado por prueba en tu clase.</p>
+  <div class="rank-filters">
+    <label>Prueba <select id="rank-route"><option value="">Todas las pruebas</option></select></label>
+    <label>Nivel <select id="rank-level"><option value="">Todos los niveles</option></select></label>
+    <button id="rank-refresh">↻ Actualizar</button>
+  </div>
+  <p id="rank-status" class="empty-state" role="status"></p>
+  <div id="rank-results"></div>
+  <button id="rank-home">¡A jugar! →</button>
+</section>
 <div id="game-content">
 
 <div class="hero"><div><h1>El secreto de<br><em>las palabras</em></h1><p>Lee, escucha y descubre pistas entre los libros.</p><a class="cta" href="#curso">Elegir curso</a></div><img class="hero-art" src="ninos-leyendo.png" alt="Los dos compañeros de OAOA leen juntos con su uniforme"></div>
@@ -348,38 +379,87 @@ teacherForm.onsubmit = async event => {
     if (revision === reportRevision) reportStatus.textContent = 'No se pudo consultar la clase. Comprueba la clave y vuelve a intentarlo.'
   } finally { submit.disabled = false }
 }
-async function showRanking(revision) {
+const rankPage = byId('ranking-page')
+const rankStatus = byId('rank-status')
+const rankResults = byId('rank-results')
+let rankRequest = 0
+for (const [label, route] of Object.entries(progressRoutes)) byId('rank-route').add(new Option(label, route))
+for (const [i, name] of ['Empiezo','Avanzo','Reto','Experto'].entries()) byId('rank-level').add(new Option((i + 1) + ' · ' + name, i + 1))
+async function showRanking() {
+  const revision = ++rankRequest
+  rankResults.replaceChildren()
   if (!token) {
-    reportStatus.textContent = 'Entra con tu cuenta de OAOA para ver el ranking de tu clase. En este dispositivo: ' + readerPoints + ' puntos de práctica.'
-    panelResults.append(button('Ir a Mi cuenta', () => { panel.close(); openAccount() }))
+    rankStatus.textContent = 'Entra con tu cuenta de OAOA para ver el ranking de tu clase.'
+    rankResults.append(button('Ir a Mi cuenta', openAccount))
     return
   }
+  rankStatus.textContent = 'Cargando…'
   try {
-    const result = await progressRpc('rankingLengua')
-    if (revision !== reportRevision) return
-    reportStatus.textContent = 'Ranking de Lengua de tu clase. Cuenta tu mejor resultado en cada prueba.'
-    renderProgressTable(result.rows, false)
+    const result = await progressRpc('rankingLengua', {route:byId('rank-route').value,level:byId('rank-level').value})
+    if (revision !== rankRequest) return
+    const activeRows = result.rows.filter(row => row.played > 0)
+    rankStatus.textContent = activeRows.length ? '' : 'Aún no hay puntos con estos filtros. ¡Puedes empezar tú!'
     const own = result.rows.find(row => row.own)
-    if (own) panelResults.prepend(coinBadge(own.correct * 10))
+    if (own) rankResults.append(coinBadge((own.walletCorrect ?? own.correct) * 10))
+    const table = document.createElement('ol')
+    table.className = 'ranking-table'
+    activeRows.forEach((row,index) => {
+      const line = document.createElement('li')
+      line.className = 'ranking-row'
+      if (row.own) line.dataset.own = ''
+      const position = document.createElement('b')
+      position.textContent = ['🥇','🥈','🥉'][index] ?? index + 1
+      position.setAttribute('aria-label','Puesto ' + (index + 1))
+      const person = document.createElement('span')
+      const detail = document.createElement('small')
+      person.textContent = row.name
+      detail.textContent = row.played + ' ' + (row.played === 1 ? 'partida' : 'partidas')
+      person.append(detail)
+      const points = document.createElement('strong')
+      points.textContent = row.points + ' pts'
+      line.append(position,person,points)
+      table.append(line)
+    })
+    if (activeRows.length) rankResults.append(table)
   } catch {
-    if (revision === reportRevision) reportStatus.textContent = 'No se pudo consultar el ranking. Comprueba que tu sesión siga abierta.'
+    if (revision === rankRequest) rankStatus.textContent = 'No se pudo consultar el ranking. Comprueba que tu sesión siga abierta.'
   }
+}
+function openRanking() {
+  stopAudio()
+  byId('game-content').hidden = true
+  rankPage.hidden = false
+  byId('ranking-title').focus()
+  showRanking()
+}
+byId('rank-refresh').onclick = showRanking
+byId('rank-route').onchange = showRanking
+byId('rank-level').onchange = showRanking
+byId('rank-home').onclick = () => {
+  ++rankRequest
+  rankPage.hidden = true
+  byId('game-content').hidden = false
+  if (new URLSearchParams(location.search).get('panel') === 'Ranking') {
+    const url = new URL(location.href)
+    url.searchParams.delete('panel')
+    history.replaceState(null,'',url)
+  }
+  document.querySelector('[data-panel="Ranking"]').focus()
 }
 for (const control of document.querySelectorAll('[data-panel]')) {
   control.onclick = () => {
     const title = control.dataset.panel
     if (title === 'Mi cuenta') return openAccount()
-    const revision = ++reportRevision
+    if (title === 'Ranking') return openRanking()
+    ++reportRevision
     teacherForm.hidden = title !== 'Profesor'
     panelResults.replaceChildren()
     byId('panel-title').textContent = title
     byId('panel-content').textContent = {
-      'Ranking': 'Cargando el ranking de Lengua…',
       'Profesor': 'Elige la clase y la semana. Usa la misma clave docente que en OAOA.',
       'Cómo se juega': 'Elige un curso, abre un tema y selecciona una actividad. Usa Cambiar de juego para volver al menú del tema.'
     }[title]
     panel.showModal()
-    if (title === 'Ranking') showRanking(revision)
   }
 }
 byId('sound').onclick = () => {
@@ -387,6 +467,19 @@ byId('sound').onclick = () => {
   byId('sound').setAttribute('aria-pressed', String(soundOn))
   byId('sound').lastChild.textContent = soundOn ? 'Sonido' : 'Sonido silenciado'
   if (!soundOn) stopAudio()
+}
+const descriptions = {
+  'Lecturas comprensivas':'Lee un poema y descubre sus pistas.',
+  'Ortografía':'Elige la forma correcta de escribir.',
+  'Sustantivos':'Reconoce nombres, género y número.',
+  'Tipos de texto':'Distingue cuentos, poemas y avisos.',
+  'Completa el poema':'Encuentra la palabra que rima.',
+  'Tipos de rima':'Distingue rima consonante y asonante.',
+  'Detective de faltas':'Encuentra y corrige la palabra intrusa.',
+  'Ordena los versos':'Reconstruye el poema paso a paso.',
+  'Escribe tu poema':'Inventa y revisa cuatro versos.',
+  'Dictado en audio':'Escucha y escribe a tu ritmo.',
+  'Teoría':'Repasa las ideas de la unidad.'
 }
 const nav = byId('games')
 const exercise = byId('exercise')
@@ -407,7 +500,8 @@ function completeRun() {
   const completedRun = run
   const body = {
     id:completedRun.id, route, level:level + 1, total:queue.length,
-    correct:[...completedRun.answers.values()].filter(Boolean).length
+    correct:[...completedRun.answers.values()].filter(Boolean).length,
+    elapsedMs:Math.round(performance.now() - completedRun.started)
   }
   const status = document.createElement('p')
   status.id = 'progress-state'
@@ -418,6 +512,10 @@ function completeRun() {
     try {
       const result = await progressRpc('saveLengua', body)
       status.replaceChildren(document.createTextNode('Partida guardada. '), coinBadge(body.correct * 10, 'monedas ganadas'))
+      if (result.run && Number.isFinite(result.run.points)) {
+        const seconds = Math.round(body.elapsedMs / 1000)
+        status.append(document.createTextNode(' · ' + seconds + ' s · ' + result.run.points + ' puntos' + (result.run.bonus ? ' (+' + result.run.bonus + ' por rapidez)' : '')))
+      }
       const own = result.rows.find(row => row.own)
       if (own) status.append(document.createTextNode(' '), coinBadge(own.correct * 10, 'monedas en total'))
     } catch {
@@ -499,6 +597,15 @@ function selectUnit(unit, course, unitIndex) {
     const colors = palette[icons[name] % palette.length]
     item.style.setProperty('--game-bg', colors[0])
     item.style.setProperty('--game-edge', colors[1])
+    const copy = document.createElement('span')
+    copy.className = 'game-card-copy'
+    const title = document.createElement('strong')
+    const detail = document.createElement('small')
+    title.textContent = name
+    detail.textContent = descriptions[name] ?? ''
+    item.setAttribute('aria-label',name)
+    copy.append(title,detail)
+    item.replaceChildren(copy)
     addIcon(item, icons[name])
     nav.append(item)
   }
@@ -519,7 +626,7 @@ function selectUnit(unit, course, unitIndex) {
 function startGame(name) {
   active = name
   round = 0
-  run = {id:crypto.randomUUID(), answers:new Map()}
+  run = {id:crypto.randomUUID(), answers:new Map(), started:performance.now()}
   const bank = activities[name]
   queue = name === 'Lecturas comprensivas' ? [...bank].sort((a, b) => a[0].localeCompare(b[0])) : shuffled(bank)
   if (level === 0 && !['Dictado en audio', 'Lecturas comprensivas'].includes(name)) queue = queue.slice(0, 3)
