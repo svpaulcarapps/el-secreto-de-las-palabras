@@ -110,6 +110,12 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 #games .glyph{width:3.75rem;height:3.75rem}
 .game-card-copy{display:grid;gap:.4rem}.game-card-copy strong{font-size:1.25rem;line-height:1.15}.game-card-copy small{font-size:.9rem;font-weight:500;color:#354c64}
 </style>
+
+<style>
+.svp-portal-link { display:inline-flex; align-items:center; min-height:32px; padding:0 9px; border-radius:7px; border:1px solid currentColor; color:inherit; background:transparent; text-decoration:none; font:600 13px system-ui,sans-serif; }
+.svp-portal-link:hover { text-decoration:underline; }
+.svp-portal-link:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+</style>
 </head>
 <body>
 <header><a class="brand" href="./"><img src="logo-lengua.png" alt="" width="66" height="66"><span>Aventuras de Lengua<br><strong>El secreto de las palabras</strong></span></a><nav aria-label="Menú principal">
@@ -118,7 +124,7 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <button data-panel="Mi cuenta"><span class="glyph" aria-hidden="true">👤</span>Mi cuenta</button>
 <button data-panel="Profesor"><span class="glyph" aria-hidden="true">🧑‍🏫</span>Profesor</button>
 <button data-panel="Cómo se juega"><span class="glyph" aria-hidden="true">📖</span>Cómo se juega</button>
-<span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
+<a class="svp-portal-link" href="https://svpaulcarapps.github.io/san-vicente-apps/">Todas las apps</a><span class="level-tag">LENGUA · PRIMARIA</span></nav></header>
 <dialog id="panel" aria-labelledby="panel-title"><h2 id="panel-title"></h2><p id="panel-content" role="status"></p>
 <div id="panel-results"></div>
 <form id="teacher-form" hidden>
