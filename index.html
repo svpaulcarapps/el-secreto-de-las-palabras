@@ -140,7 +140,7 @@ header .level-tag{display:inline-flex;align-items:center;justify-content:center;
 <section id="ranking-page" hidden aria-labelledby="ranking-title">
   <h1 id="ranking-title" tabindex="-1">🏆 Nuestro ranking</h1>
   <p>Ganas puntos por acertar. Con al menos un 80 % de aciertos puedes sumar hasta 50 puntos por rapidez. El tiempo nunca resta puntos.</p>
-  <p>El ranking suma tu mejor resultado por prueba en tu clase.</p>
+  <p>El ranking suma el mejor resultado de cada prueba. Con tu cuenta puedes consultar el de tu clase.</p>
   <div class="rank-filters">
     <label>Prueba <select id="rank-route"><option value="">Todas las pruebas</option></select></label>
     <label>Nivel <select id="rank-level"><option value="">Todos los niveles</option></select></label>
@@ -281,7 +281,7 @@ async function showCongratulations() {
   card.append(portrait,message)
   exercise.append(card)
   try {
-    const [{avatarSvg}, avatar] = await Promise.all([import(oaoaBase + 'avatar.js?v=20261121-capirote'), loadPlayerAvatar()])
+    const [{avatarSvg}, avatar] = await Promise.all([import(oaoaBase + 'avatar.js?v=20261121-capirote-bajo'), loadPlayerAvatar()])
     if (!card.isConnected) return
     const svgText = avatarSvg({...avatar,motion:'thumb'}, 'Tu personaje te da la enhorabuena')
     const svg = new DOMParser().parseFromString(svgText,'image/svg+xml').documentElement
@@ -388,14 +388,16 @@ for (const [i, name] of ['Empiezo','Avanzo','Reto','Experto'].entries()) byId('r
 async function showRanking() {
   const revision = ++rankRequest
   rankResults.replaceChildren()
-  if (!token) {
-    rankStatus.textContent = 'Entra con tu cuenta de OAOA para ver el ranking de tu clase.'
-    rankResults.append(button('Ir a Mi cuenta', openAccount))
-    return
-  }
   rankStatus.textContent = 'Cargando…'
   try {
-    const result = await progressRpc('rankingLengua', {route:byId('rank-route').value,level:byId('rank-level').value})
+    const filters = {route:byId('rank-route').value,level:byId('rank-level').value}
+    let result
+    try {
+      result = token ? await progressRpc('rankingLengua', filters) : await progressRpc('rankingLenguaPublico', filters)
+    } catch (error) {
+      if (!token) throw error
+      result = await progressRpc('rankingLenguaPublico', filters)
+    }
     if (revision !== rankRequest) return
     const activeRows = result.rows.filter(row => row.played > 0)
     rankStatus.textContent = activeRows.length ? '' : 'Aún no hay puntos con estos filtros. ¡Puedes empezar tú!'
@@ -422,7 +424,7 @@ async function showRanking() {
     })
     if (activeRows.length) rankResults.append(table)
   } catch {
-    if (revision === rankRequest) rankStatus.textContent = 'No se pudo consultar el ranking. Comprueba que tu sesión siga abierta.'
+    if (revision === rankRequest) rankStatus.textContent = 'No se pudo consultar el ranking. Puedes volver a intentarlo con Actualizar.'
   }
 }
 function openRanking() {
