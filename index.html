@@ -277,6 +277,7 @@ const tokenKey = 'oaoa-session'
 let token = sessionStorage.getItem(tokenKey) || sessionStorage.getItem('palabras-oaoa-token') || ''
 if (token) sessionStorage.setItem(tokenKey, token)
 sessionStorage.removeItem('palabras-oaoa-token')
+const avatarRenderer = () => import(oaoaBase + 'avatar.js?v=20261121-capirote-bajo')
 let playerAvatar
 async function loadPlayerAvatar() {
   if (!token) return {}
@@ -295,12 +296,16 @@ async function showCongratulations() {
   card.className = 'celebration'
   const portrait = document.createElement('div')
   portrait.className = 'completion-avatar'
+  portrait.textContent = '👏'
+  portrait.setAttribute('aria-hidden', 'true')
   const message = document.createElement('p')
+  message.setAttribute('role', 'status')
   message.textContent = '¡Enhorabuena! Has completado el reto.'
   card.append(portrait,message)
   exercise.append(card)
+  if (soundOn) speak(message.textContent, 0.95, false)
   try {
-    const [{avatarSvg}, avatar] = await Promise.all([import(oaoaBase + 'avatar.js?v=20261121-capirote-bajo'), loadPlayerAvatar()])
+    const [{avatarSvg}, avatar] = await Promise.all([avatarRenderer(), loadPlayerAvatar()])
     if (!card.isConnected) return
     const svgText = avatarSvg({...avatar,motion:'thumb'}, 'Tu personaje te da la enhorabuena')
     const svg = new DOMParser().parseFromString(svgText,'image/svg+xml').documentElement
@@ -312,7 +317,8 @@ async function showCongratulations() {
         else if (/^(href|xlink:href)$/i.test(attr.name) && /^assets\//.test(attr.value)) attr.value = new URL(attr.value,oaoaBase).href
       }
     }
-    portrait.append(svg)
+    portrait.removeAttribute('aria-hidden')
+    portrait.replaceChildren(svg)
   } catch {}
 }
 function coinBadge(amount,label='monedas de Lengua') {
@@ -513,6 +519,8 @@ const palette = [['#ffe9af','#c79443'],['#d9efce','#8cb27a'],['#d9edff','#85afd3
 let level = Math.max(0, levels.indexOf(params.get('nivel')))
 let active, round, activities, queue, dictationPlayer, selectedCourse, run, dedicatedPage = false
 let dictationClockInterval
+let randomMode = false
+const randomBags = new WeakMap()
 function recordAttempt(correct) {
   if (run && !run.answers.has(round)) run.answers.set(round, correct)
 }
@@ -584,6 +592,15 @@ for (let course = 1; course <= 6; course++) {
   item.style.setProperty('--course-edge', palette[course - 1][1])
   byId('courses').append(item)
 }
+function pickRandomActivity(bank, previous) {
+  let bag = randomBags.get(bank)
+  if (!bag?.length) {
+    bag = shuffled(Object.keys(bank).filter(name => Object.hasOwn(progressRoutes, name) && bank[name].length))
+    randomBags.set(bank, bag)
+  }
+  const next = bag.findIndex(name => name !== previous)
+  return bag.splice(Math.max(0, next), 1)[0]
+}
 function selectUnit(unit, course, unitIndex) {
   selectedCourse = course
   stopAudio()
@@ -599,6 +616,19 @@ function selectUnit(unit, course, unitIndex) {
   const drawLinks = () => {
   byId('level-help').textContent = levelHelp[level]
   nav.replaceChildren()
+  if (Object.keys(activities).some(name => Object.hasOwn(progressRoutes, name) && activities[name].length)) {
+    const random = button('Actividad al azar', () => {
+      const name = pickRandomActivity(activities, active)
+      if (!name) return
+      if (dedicatedPage) { startGame(name, true); return }
+      params.set('curso', String(course))
+      params.set('unidad', String(unitIndex + 1))
+      history.pushState(null, '', '?' + params)
+      openActivityPage(unit, course, unitIndex, name, true)
+    })
+    addIcon(random, 10)
+    nav.append(random)
+  }
   for (const name of Object.keys(activities)) {
     const item = dedicatedPage ? button(name, () => startGame(name)) : document.createElement('a')
     if (!dedicatedPage) {
@@ -645,7 +675,12 @@ function selectUnit(unit, course, unitIndex) {
   drawLinks()
   byId('unit-title').focus()
 }
-function startGame(name) {
+function startGame(name, random = false) {
+  randomMode = random
+  if (Object.hasOwn(progressRoutes, name)) {
+    void avatarRenderer().catch(() => {})
+    void loadPlayerAvatar()
+  }
   active = name
   round = 0
   run = {id:crypto.randomUUID(), answers:new Map(), started:performance.now()}
@@ -672,13 +707,13 @@ function stopAudio() {
   if ('speechSynthesis' in window) speechSynthesis.cancel()
   if (dictationPlayer) { dictationPlayer.pause(); dictationPlayer = null }
 }
-function speak(value, rate = 0.9) {
+function speak(value, rate = 0.9, reportError = true) {
   if (!soundOn) {
     feedback.textContent = 'Activa Sonido en el menú superior para escuchar.'
     return
   }
   if (!('speechSynthesis' in window)) {
-    feedback.textContent = 'Este navegador no ofrece lectura en voz alta.'
+    if (reportError) feedback.textContent = 'Este navegador no ofrece lectura en voz alta.'
     return
   }
   speechSynthesis.cancel()
@@ -694,7 +729,7 @@ function speak(value, rate = 0.9) {
   if (preferred) utterance.voice = preferred
   utterance.lang = preferred?.lang ?? 'es-ES'
   utterance.rate = rate
-  utterance.onerror = () => { feedback.textContent = 'El audio no está disponible. Revisa la voz de español del navegador.' }
+  if (reportError) utterance.onerror = () => { feedback.textContent = 'El audio no está disponible. Revisa la voz de español del navegador.' }
   speechSynthesis.speak(utterance)
 }
 function paragraph(value, tag = 'p') {
@@ -735,6 +770,15 @@ function showDictationClock(completed) {
     if (!clock.isConnected || clock.closest('[hidden]')) clearInterval(dictationClockInterval)
     else update()
   }, 250)
+}
+function addReplay(label) {
+  exercise.append(button(label, () => startGame(active)))
+  if (randomMode) {
+    exercise.append(button('Otra actividad al azar', () => {
+      const name = pickRandomActivity(activities, active)
+      if (name) startGame(name, true)
+    }))
+  }
 }
 function render() {
   clearInterval(dictationClockInterval)
@@ -780,7 +824,7 @@ function render() {
     if (completed) {
       showCongratulations()
       completeRun()
-      exercise.append(button('Volver a practicar', () => startGame(active)))
+      addReplay('Volver a practicar')
       return
     }
     const sentence = queue[round]
@@ -816,7 +860,7 @@ function render() {
   if (round === questions.length) {
     showCongratulations()
     completeRun()
-    exercise.append(button('Volver a jugar', () => startGame(active)))
+    addReplay('Volver a jugar')
     return
   }
   paragraph('Reto ' + (round + 1) + ' de ' + questions.length)
@@ -904,13 +948,13 @@ for (const [selector, icon] of [['#sound', 8], ['[data-panel="Ranking"]', 10], [
 const requestedCourse = Number(params.get('curso'))
 const requestedUnitIndex = Number(params.get('unidad')) - 1
 const requestedUnit = courses[requestedCourse]?.[requestedUnitIndex]
-function openActivityPage(unit, course, unitIndex, name) {
+function openActivityPage(unit, course, unitIndex, name, random = false) {
   dedicatedPage = true
   document.querySelector('.hero').hidden = true
   byId('curso').hidden = true
   byId('units').hidden = true
   selectUnit(unit, course, unitIndex)
-  startGame(name)
+  startGame(name, random)
 }
 if (requestedGame && requestedUnit?.activities && Object.hasOwn(requestedUnit.activities, requestedGame)) {
   openActivityPage(requestedUnit, requestedCourse, requestedUnitIndex, requestedGame)
