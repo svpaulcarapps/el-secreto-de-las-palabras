@@ -512,6 +512,7 @@ const levelHelp = ['Preguntas guiadas con una pista.', 'Más preguntas y opcione
 const palette = [['#ffe9af','#c79443'],['#d9efce','#8cb27a'],['#d9edff','#85afd3'],['#eadfff','#a58ac8'],['#ffdfd9','#ce9589'],['#d0efe8','#76a99b']]
 let level = Math.max(0, levels.indexOf(params.get('nivel')))
 let active, round, activities, queue, dictationPlayer, selectedCourse, run, dedicatedPage = false
+let dictationClockInterval
 function recordAttempt(correct) {
   if (run && !run.answers.has(round)) run.answers.set(round, correct)
 }
@@ -522,7 +523,7 @@ function completeRun() {
   const body = {
     id:completedRun.id, route, level:level + 1, total:queue.length,
     correct:[...completedRun.answers.values()].filter(Boolean).length,
-    elapsedMs:Math.round(performance.now() - completedRun.started)
+    elapsedMs:Math.round((completedRun.finished ?? performance.now()) - completedRun.started)
   }
   const status = document.createElement('p')
   status.id = 'progress-state'
@@ -718,7 +719,25 @@ function normalizeDictation(value, course) {
   const normalized = value.trim().replace(/\s+/g, ' ').normalize('NFC')
   return course <= 3 ? normalized.normalize('NFD').replace(/\u0301/g, '').normalize('NFC') : normalized
 }
+function showDictationClock(completed) {
+  if (completed) run.finished ??= performance.now()
+  const clock = document.createElement('p')
+  const time = document.createElement('time')
+  clock.append(completed ? 'Tiempo total: ' : 'Tiempo: ', time)
+  exercise.append(clock)
+  const update = () => {
+    const seconds = Math.floor(((run.finished ?? performance.now()) - run.started) / 1000)
+    time.dateTime = 'PT' + seconds + 'S'
+    time.textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0')
+  }
+  update()
+  if (!completed) dictationClockInterval = setInterval(() => {
+    if (!clock.isConnected || clock.closest('[hidden]')) clearInterval(dictationClockInterval)
+    else update()
+  }, 250)
+}
 function render() {
+  clearInterval(dictationClockInterval)
   stopAudio()
   byId('title').textContent = active
   feedback.textContent = ''
@@ -756,7 +775,9 @@ function render() {
     return
   }
   if (active === 'Dictado en audio') {
-    if (round === activities[active].length) {
+    const completed = round === queue.length
+    showDictationClock(completed)
+    if (completed) {
       showCongratulations()
       completeRun()
       exercise.append(button('Volver a practicar', () => startGame(active)))
@@ -767,7 +788,7 @@ function render() {
     const play = rate => {
       stopAudio()
       if (!soundOn) { feedback.textContent = 'Activa Sonido en el menú superior para escuchar.'; return }
-      dictationPlayer = new Audio('dictado-' + recording + '.mp3')
+      dictationPlayer = new Audio('dictado-ximena-' + recording + '.mp3')
       dictationPlayer.playbackRate = rate
       dictationPlayer.play().catch(() => { feedback.textContent = 'No se ha podido reproducir el dictado. Vuelve a intentarlo.' })
     }
